@@ -4,7 +4,6 @@ using System.IO;
 using System.Linq;
 using System.Text.Json;
 using System.Text.Json.Serialization;
-using EasySave.Localization;
 using EasySave.Logging;
 
 namespace EasySave.Model
@@ -13,13 +12,11 @@ namespace EasySave.Model
     {
         private readonly string _jsonFilePath;
         private readonly JsonSerializerOptions _jsonOptions;
-        public const int MaxBackups = 5;
+        private const int MaxBackups = 5;
         private readonly ILogger _logger;
-        private readonly IStateTracker _stateTracker;
-        private readonly ILocalizationService _localization;
 
 
-        public BackupService(ILocalizationService localization)
+        public BackupService()
         {
             string directoryPath = Path.Combine(
                 Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments),
@@ -37,10 +34,7 @@ namespace EasySave.Model
                 IncludeFields = true
             };
 
-            _logger = new FileLogger(); // Initializing logger 
-            _stateTracker = new FileStateTracker(); // Initializing state tracker
-            _localization = localization; // Initializing language service
-
+            _logger = new FileLogger(); 
         }
 
         public List<Backup> GetAllBackups()
@@ -59,6 +53,7 @@ namespace EasySave.Model
             }
             catch (Exception ex)
             {
+                Console.WriteLine($"Error reading backups: {ex.Message}");
                 return new List<Backup>();
             }
         }
@@ -70,34 +65,34 @@ namespace EasySave.Model
             // Check maximum backups limit
             if (backups.Count >= MaxBackups)
             {
-                return (false, "MaximumBackupsReached");
+                return (false, $"Maximum of {MaxBackups} backups reached");
             }
 
             // Check duplicate name
             if (backups.Any(b => b.BackupName.Equals(newBackup.BackupName, StringComparison.OrdinalIgnoreCase)))
             {
-                return (false, "BackupNameExists");
+                return (false, "Backup name already exists");
             }
 
             // Check source path
             if (!Directory.Exists(newBackup.Source))
             {
-                return (false, "SourcePathNotExist");
+                return (false, "Source path does not exist");
             }
 
             // Check target path
             if (!Directory.Exists(newBackup.Target))
             {
-                return (false, "TargetPathNotExist");
+                return (false, "Target path does not exist");
             }
 
             // Check backup type
             if (newBackup.Type != 1 && newBackup.Type != 2)
             {
-                return (false, "InvalidBackupType");
+                return (false, "Invalid backup type (must be 1 or 2)");
             }
 
-            return (true, "BackupValid");
+            return (true, "Backup is valid");
         }
 
         public (bool isValid, string message) ValidateUpdatedBackup(Backup newBackup)
@@ -106,22 +101,22 @@ namespace EasySave.Model
             // Check source path
             if (!Directory.Exists(newBackup.Source))
             {
-                return (false, "SourcePathNotExist");
+                return (false, "Source path does not exist");
             }
 
             // Check target path
             if (!Directory.Exists(newBackup.Target))
             {
-                return (false, "TargetPathNotExist");
+                return (false, "Target path does not exist");
             }
 
             // Check backup type
             if (newBackup.Type != 1 && newBackup.Type != 2)
             {
-                return (false, "InvalidBackupType");
+                return (false, "Invalid backup type (must be 1 or 2)");
             }
 
-            return (true, "BackupValid");
+            return (true, "Backup is valid");
         }
 
         public string CreateBackup(Backup backup)
@@ -134,11 +129,11 @@ namespace EasySave.Model
                 string json = JsonSerializer.Serialize(backups, _jsonOptions);
                 File.WriteAllText(_jsonFilePath, json);
 
-                return "BackupCreatedSuccess";
+                return "Backup created successfully!";
             }
             catch (Exception ex)
             {
-                return "BackupCreateFailed";
+                return $"Failed to create backup: {ex.Message}";
             }
         }
 
@@ -152,7 +147,7 @@ namespace EasySave.Model
 
                 if (backupToRemove == null)
                 {
-                    return "BackupNotFound";
+                    return $"Backup '{backupName}' not found";
                 }
 
                 backups.Remove(backupToRemove);
@@ -161,11 +156,11 @@ namespace EasySave.Model
                 var json = JsonSerializer.Serialize(backups, options);
                 File.WriteAllText(_jsonFilePath, json);
 
-                return "BackupDeleted";
+                return $"Backup '{backupName}' deleted successfully";
             }
             catch (Exception ex)
             {
-                return "Error";
+                return $"Failed to delete backup: {ex.Message}";
             }
         }
 
@@ -176,7 +171,7 @@ namespace EasySave.Model
                 b.BackupName.Equals(backupName, StringComparison.OrdinalIgnoreCase));
 
             return backup == null
-                ? (null, "NoBackupsAvailable")
+                ? (null, $"Backup '{backupName}' not found")
                 : (backup, "Backup found");
         }
 
@@ -188,7 +183,7 @@ namespace EasySave.Model
                 var index = backups.FindIndex(b =>
                     b.BackupName.Equals(originalName, StringComparison.OrdinalIgnoreCase));
 
-                if (index == -1) return "BackupNotFound";
+                if (index == -1) return $"Backup '{originalName}' not found";
 
                 backups[index] = updatedBackup;
 
@@ -196,11 +191,11 @@ namespace EasySave.Model
                 var json = JsonSerializer.Serialize(backups, options);
                 File.WriteAllText(_jsonFilePath, json);
 
-                return "BackupUpdatedSuccess";
+                return $"Backup '{updatedBackup.BackupName}' updated successfully";
             }
             catch (Exception ex)
             {
-                return "Error";
+                return $"Failed to update backup: {ex.Message}";
             }
         }
 
@@ -212,7 +207,7 @@ namespace EasySave.Model
         public (List<string> backupNames, string error) ParseBackupSelection(string input, List<Backup> allBackups)
         {
             if (string.IsNullOrWhiteSpace(input))
-                return (null, "EmptyInput");
+                return (null, "Empty input");
 
             if (input.Equals("all", StringComparison.OrdinalIgnoreCase))
                 return (allBackups.Select(b => b.BackupName).ToList(), null);
@@ -221,7 +216,7 @@ namespace EasySave.Model
             var parts = input.Split(new[] { ',', '-' }, StringSplitOptions.RemoveEmptyEntries);
 
             if (parts.Length == 0)
-                return (null, "InvalidInputFormat");
+                return (null, "Invalid input format");
 
             // Handle comma-separated list
             if (input.Contains(','))
@@ -231,7 +226,7 @@ namespace EasySave.Model
                     if (int.TryParse(part, out int index) && index > 0 && index <= allBackups.Count)
                         results.Add(allBackups[index - 1].BackupName);
                     else
-                        return (null, "InvalidBackupNumber");
+                        return (null, $"Invalid backup number: {part}");
                 }
                 return (results, null);
             }
@@ -246,14 +241,14 @@ namespace EasySave.Model
                         results.Add(allBackups[i - 1].BackupName);
                     return (results, null);
                 }
-                return (null, "InvalidRange");
+                return (null, $"Invalid range: {input}");
             }
 
             // Handle single number
             if (int.TryParse(input, out int singleIndex) && singleIndex > 0 && singleIndex <= allBackups.Count)
                 return (new List<string> { allBackups[singleIndex - 1].BackupName }, null);
 
-            return (null, "InvalidInput");
+            return (null, $"Invalid input: {input}");
         }
 
         public List<string> ExecuteBackups(List<string> backupNames)
@@ -267,49 +262,27 @@ namespace EasySave.Model
                     var (backup, message) = GetBackupByName(backupName);
                     if (backup == null)
                     {
-                        results.Add(_localization.Format("BackupNotFound", backupName));
+                        results.Add($"Backup '{backupName}' not found");
                         continue;
                     }
 
-                    //initialize state
-                    _stateTracker.InitializeState(backup.BackupName);
-
                     if (backup.Type == 1) // Full backup
                     {
-                        // Count files and total size first
-                        var fileCount = CountFiles(backup.Source);
-                        _stateTracker.UpdateState(backup.BackupName, "Preparing",
-                            fileCount.Count, fileCount.TotalSize);
-
                         CopyDirectory(backup.Source, backup.Target, backup.BackupName, true, null);
-                        results.Add(_localization.Format("FullBackupSuccess", backup.BackupName));
-
-                        _stateTracker.UpdateState(backup.BackupName, "Completed");
+                        results.Add($"Full backup '{backup.BackupName}' executed successfully");
                     }
                     else // Differential backup
                     {
                         string originalBackupPath = FindOriginalFullBackup(backup.Target, backup.BackupName);
                         if (originalBackupPath == null)
                         {
-                            // Count files and total size first
-                            var fileCount = CountFiles(backup.Source);
-                            _stateTracker.UpdateState(backup.BackupName, "Preparing",
-                                fileCount.Count, fileCount.TotalSize);
-
                             CopyDirectory(backup.Source, backup.Target, backup.BackupName, true, null);
-                            results.Add(_localization.Format("DifferentialBackupSuccess", backup.BackupName));
-                            _stateTracker.UpdateState(backup.BackupName, "Completed");
+                            results.Add($"Initial full backup '{backup.BackupName}' executed successfully (no base backup found)");
                         }
                         else
                         {
-                            // Count changed files and total size first
-                            var fileCount = CountChangedFiles(backup.Source, originalBackupPath);
-                            _stateTracker.UpdateState(backup.BackupName, "Preparing",
-                                fileCount.Count, fileCount.TotalSize);
-
                             CopyDirectory(backup.Source, backup.Target, backup.BackupName, false, originalBackupPath);
                             results.Add($"Differential backup '{backup.BackupName}' executed successfully");
-                            _stateTracker.UpdateState(backup.BackupName, "Completed");
                         }
                     }
                 }
@@ -320,42 +293,6 @@ namespace EasySave.Model
             }
 
             return results;
-        }
-
-        // Count files and total size in a directory
-        private (int Count, long TotalSize) CountFiles(string directory)
-        {
-            int count = 0;
-            long totalSize = 0;
-
-            foreach (var file in Directory.GetFiles(directory, "*", SearchOption.AllDirectories))
-            {
-                count++;
-                totalSize += new FileInfo(file).Length;
-            }
-
-            return (count, totalSize);
-        }
-
-        // Count changed files and total size in a directory compared to the last full backup
-        private (int Count, long TotalSize) CountChangedFiles(string sourceDir, string lastBackupPath)
-        {
-            int count = 0;
-            long totalSize = 0;
-
-            foreach (var file in Directory.GetFiles(sourceDir, "*", SearchOption.AllDirectories))
-            {
-                string relativePath = file.Substring(sourceDir.Length + 1);
-                string lastBackupFile = Path.Combine(lastBackupPath, relativePath);
-
-                if (!File.Exists(lastBackupFile) || File.GetLastWriteTime(file) > File.GetLastWriteTime(lastBackupFile))
-                {
-                    count++;
-                    totalSize += new FileInfo(file).Length;
-                }
-            }
-
-            return (count, totalSize);
         }
 
         private string FindOriginalFullBackup(string targetDir, string backupName)
@@ -396,18 +333,13 @@ namespace EasySave.Model
                 hasChanges = true; // Full backup always has "changes"
             }
 
-            if (!hasChanges)
-            {
-                _stateTracker.UpdateState(backupName, "NoChanges");
-                return; // No changes, skip backup
-            }
+            if (!hasChanges) return; // No changes, skip backup
 
             // Second pass: actually copy files
             Directory.CreateDirectory(backupTargetDir);
-            var files = Directory.GetFiles(sourceDir);
-            for (int i = 0; i < files.Length; i++)
+
+            foreach (var file in Directory.GetFiles(sourceDir))
             {
-                string file = files[i];
                 string fileName = Path.GetFileName(file);
                 string destFile = Path.Combine(backupTargetDir, fileName);
 
@@ -424,10 +356,6 @@ namespace EasySave.Model
                 {
                     try
                     {
-                        // Update state before copying
-                        _stateTracker.UpdateState(backupName, "InProgress",
-                            currentSource: file, currentTarget: destFile);
-
                         var startTime = DateTime.Now;
                         File.Copy(file, destFile, true);
                         var endTime = DateTime.Now;
@@ -441,10 +369,6 @@ namespace EasySave.Model
                             fileInfo.Length,
                             (endTime - startTime).TotalMilliseconds
                         );
-
-                        // Update state after successful copy
-                        _stateTracker.UpdateState(backupName, "InProgress",
-                            filesCopied: i + 1, sizeCopied: fileInfo.Length);
                     }
                     catch (Exception ex)
                     {
@@ -456,9 +380,6 @@ namespace EasySave.Model
                             new FileInfo(file).Length,
                             -1 // Negative value indicates failure
                         );
-
-                        _stateTracker.UpdateState(backupName, "Error",
-                            currentSource: file, currentTarget: destFile);
                     }
                 }
             }

@@ -77,12 +77,21 @@
     <Compile Include="Controllers\Controller.cs" />
     <Compile Include="Model\Backup.cs" />
     <Compile Include="Model\BackupService.cs" />
+    <Compile Include="Model\FileStateTracker.cs" />
+    <Compile Include="Model\IStateTracker.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Service\JsonLocalizationService .cs" />
     <Compile Include="Views\View.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
+    <None Include="Languages\en.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="Languages\fr.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
@@ -94,5 +103,6 @@
       <Name>EasySave.Logging</Name>
     </ProjectReference>
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

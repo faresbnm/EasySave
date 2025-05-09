@@ -1,42 +1,51 @@
 ﻿using System;
 using System.Collections.Generic;
+using EasySave.Localization;
 using EasySave.Model;
 
 namespace EasySave.Views
 {
     internal class View
     {
+        private readonly ILocalizationService _localization;
+
+        public View(ILocalizationService localization)
+        {
+            _localization = localization;
+        }
+
         public void ShowStart()
         {
             Console.Clear();
-            Console.WriteLine("  ______     ______     ______     __  __        ______     ______     __   __   ______       \r\n/\\  ___\\   /\\  __ \\   /\\  ___\\   /\\ \\_\\ \\      /\\  ___\\   /\\  __ \\   /\\ \\ / /  /\\  ___\\      \r\n\\ \\  __\\   \\ \\  __ \\  \\ \\___  \\  \\ \\____ \\     \\ \\___  \\  \\ \\  __ \\  \\ \\ \\'/   \\ \\  __\\      \r\n \\ \\_____\\  \\ \\_\\ \\_\\  \\/\\_____\\  \\/\\_____\\     \\/\\_____\\  \\ \\_\\ \\_\\  \\ \\__|    \\ \\_____\\    \r\n  \\/_____/   \\/_/\\/_/   \\/_____/   \\/_____/      \\/_____/   \\/_/\\/_/   \\/_/      \\/_____/    \r\n                                                                                             ");
+            Console.WriteLine(_localization["WelcomeTitle"]);
             Console.WriteLine("\n");
-            Console.WriteLine("[+] Menu:");
-            Console.WriteLine("1- List Backup jobs");
-            Console.WriteLine("2- Add a job");
-            Console.WriteLine("3- Update a job");
-            Console.WriteLine("4- Delete a job");
-            Console.WriteLine("5- Execute a job");
-            Console.WriteLine("6- Exit");
-            Console.Write("\nSelect an option: ");
+            Console.WriteLine(_localization["MenuTitle"]);
+            Console.WriteLine(_localization["MenuOption1"]);
+            Console.WriteLine(_localization["MenuOption2"]);
+            Console.WriteLine(_localization["MenuOption3"]);
+            Console.WriteLine(_localization["MenuOption4"]);
+            Console.WriteLine(_localization["MenuOption5"]);
+            Console.WriteLine(_localization["MenuOption6"]);
+            Console.Write("\n" + _localization["SelectOption"]);
         }
 
         public (string name, string source, string target, int type) GetBackupInfo()
         {
             Console.Clear();
-            Console.WriteLine("[+] New Backup");
-            string name = GetUserInput("Enter the backup name: ");
-            string source = GetUserInput("Enter the source directory: ");
-            string target = GetUserInput("Enter the target directory: ");
+            Console.WriteLine(_localization["NewBackupTitle"]);
+            string name = GetUserInput(_localization["EnterBackupName"]);
+            string source = GetUserInput(_localization["EnterSourceDirectory"]);
+            string target = GetUserInput(_localization["EnterTargetDirectory"]);
 
             int type;
             while (true)
             {
-                string typeInput = GetUserInput("Enter the type of backup (1 for full, 2 for differential): ");
-                if (int.TryParse(typeInput, out type))
+                string typeInput = GetUserInput(_localization["EnterBackupType"]);
+                if (int.TryParse(typeInput, out type) && (type == 1 || type == 2))
                 {
                     break;
                 }
+                ShowError(_localization["InvalidBackupType"]);
             }
             return (name, source, target, type);
         }
@@ -47,76 +56,79 @@ namespace EasySave.Views
             return Console.ReadLine();
         }
 
-        public void ShowMessage(string message)
+        public void ShowMessage(string messageKey)
         {
             Console.ForegroundColor = ConsoleColor.Green;
-            Console.WriteLine($"[+] {message}");
-            Console.ResetColor(); 
-            Console.WriteLine("Press any key to continue...");
+            Console.WriteLine(_localization[messageKey]);
+            Console.ResetColor();
+            Console.WriteLine(_localization["PressAnyKeyToContinue"]);
             Console.ReadKey();
         }
 
-        public void ShowError(string message)
+        public void ShowError(string messageKey)
         {
             Console.ForegroundColor = ConsoleColor.Red;
-            Console.WriteLine($"[!] {message}");
+            Console.WriteLine(_localization[messageKey]);
             Console.ResetColor();
-            Console.WriteLine("Press any key to continue...");
+            Console.WriteLine(_localization["PressAnyKeyToContinue"]);
             Console.ReadKey();
         }
 
-        public void ListBackups(List<Model.Backup> backups)
+        public void ListBackups(List<Backup> backups)
         {
             Console.Clear();
-            Console.WriteLine("[+] Backup Jobs List:");
+            Console.WriteLine(_localization["BackupJobsList"]);
 
             if (backups.Count == 0)
             {
-                Console.WriteLine("No backup jobs found.");
+                Console.WriteLine(_localization["NoBackupJobs"]);
             }
             else
             {
                 foreach (var backup in backups)
                 {
-                    Console.WriteLine($"\nName: {backup.BackupName}");
-                    Console.WriteLine($"Source: {backup.Source}");
-                    Console.WriteLine($"Target: {backup.Target}");
-                    Console.WriteLine($"Type: {(backup.Type == 1 ? "Full" : "Differential")}");
+                    Console.WriteLine(_localization.Format("BackupDetails",
+                        backup.BackupName,
+                        backup.Source,
+                        backup.Target,
+                        backup.Type == 1 ? _localization["BackupTypeFull"] : _localization["BackupTypeDifferential"]));
                     Console.WriteLine("-----------------------");
                 }
             }
 
-            Console.WriteLine("\nPress any key to continue...");
+            Console.WriteLine("\n" + _localization["PressAnyKeyToContinue"]);
             Console.ReadKey();
         }
 
         public string GetBackupNameToDelete()
         {
             Console.Clear();
-            Console.WriteLine("[+] Delete Backup");
-            return GetUserInput("Enter the name of the backup to delete: ");
+            Console.WriteLine(_localization["DeleteBackupTitle"]);
+            return GetUserInput(_localization["EnterBackupToDelete"]);
         }
 
         public string GetBackupNameToUpdate()
         {
             Console.Clear();
-            Console.WriteLine("[+] Update Backup");
-            return GetUserInput("Enter the name of the backup to update: ");
+            Console.WriteLine(_localization["UpdateBackupTitle"]);
+            return GetUserInput(_localization["EnterBackupToUpdate"]);
         }
 
         public Backup GetUpdatedBackupInfo(Backup currentBackup)
         {
             Console.Clear();
-            Console.WriteLine("[+] Update Backup");
+            Console.WriteLine(_localization["UpdateBackupTitle"]);
 
-            string newName = GetUserInput($"Name [{currentBackup.BackupName}]: ");
-            string newSource = GetUserInput($"Source [{currentBackup.Source}]: ");
-            string newTarget = GetUserInput($"Target [{currentBackup.Target}]: ");
+            string newName = GetUserInput(_localization.Format("NamePrompt", currentBackup.BackupName));
+            string newSource = GetUserInput(_localization.Format("SourcePrompt", currentBackup.Source));
+            string newTarget = GetUserInput(_localization.Format("TargetPrompt", currentBackup.Target));
 
             int newType;
             while (true)
             {
-                string typeInput = GetUserInput($"Type [{(currentBackup.Type == 1 ? "1 (Full)" : "2 (Differential)")}]: ");
+                string typeInput = GetUserInput(_localization.Format("TypePrompt",
+                    currentBackup.Type == 1 ? "1 (" + _localization["BackupTypeFull"] + ")" : "2 (" + _localization["BackupTypeDifferential"] + ")"));
+
                 if (string.IsNullOrEmpty(typeInput))
                 {
                     newType = currentBackup.Type;
@@ -126,7 +138,7 @@ namespace EasySave.Views
                 {
                     break;
                 }
-                Console.WriteLine("Invalid backup type. Please enter 1 or 2.");
+                ShowError(_localization["InvalidBackupType"]);
             }
 
             return new Backup(
@@ -139,37 +151,40 @@ namespace EasySave.Views
 
         public void ShowCurrentBackup(Backup backup)
         {
-            Console.WriteLine("\nCurrent Backup Details:");
-            Console.WriteLine($"Name: {backup.BackupName}");
-            Console.WriteLine($"Source: {backup.Source}");
-            Console.WriteLine($"Target: {backup.Target}");
-            Console.WriteLine($"Type: {(backup.Type == 1 ? "Full" : "Differential")}");
+            Console.WriteLine(_localization["CurrentBackupDetails"]);
+            Console.WriteLine(_localization.Format("BackupDetailName", backup.BackupName));
+            Console.WriteLine(_localization.Format("BackupDetailSource", backup.Source));
+            Console.WriteLine(_localization.Format("BackupDetailTarget", backup.Target));
+            Console.WriteLine(_localization.Format("BackupDetailType",
+                backup.Type == 1 ? _localization["BackupTypeFull"] : _localization["BackupTypeDifferential"]));
             Console.WriteLine("-----------------------\n");
         }
 
         public string GetExecutionChoice()
         {
             Console.Clear();
-            Console.WriteLine("[+] Backup Execution Options:");
-            Console.WriteLine("- Enter backup number (e.g., '1')");
-            Console.WriteLine("- Comma-separated list (e.g., '1,3,5')");
-            Console.WriteLine("- Range (e.g., '2-4')");
-            Console.WriteLine("- 'all' for all backups");
-            return GetUserInput("Select an option: ");
+            Console.WriteLine(_localization["BackupExecutionOptions"]);
+            Console.WriteLine(_localization["ExecutionOption1"]);
+            Console.WriteLine(_localization["ExecutionOption2"]);
+            Console.WriteLine(_localization["ExecutionOption3"]);
+            Console.WriteLine(_localization["ExecutionOption4"]);
+            return GetUserInput(_localization["SelectExecutionOption"]);
         }
 
         public string GetBackupNameToExecute()
         {
             Console.Clear();
-            Console.WriteLine("[+] Execute Single Backup");
-            return GetUserInput("Enter the name of the backup to execute: ");
+            Console.WriteLine(_localization["ExecuteSingleBackup"]);
+            return GetUserInput(_localization["EnterBackupToExecute"]);
         }
 
         public void ShowBackupInProgress(string backupName, string backupType)
         {
             Console.Clear();
-            Console.WriteLine($"[+] Executing {backupType} backup: {backupName}");
-            Console.WriteLine("Please wait...");
+            Console.WriteLine(_localization.Format("ExecutingBackup",
+                backupType == "1" ? _localization["BackupTypeFull"] : _localization["BackupTypeDifferential"],
+                backupName));
+            Console.WriteLine(_localization["PleaseWait"]);
         }
     }
 }

@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
-using EasySave.Localization;
 using EasySave.Model;
 using EasySave.Views;
 
@@ -11,13 +10,11 @@ namespace EasySave.Controllers
     {
         private readonly View _view;
         private readonly BackupService _backupService;
-        private readonly ILocalizationService _localization;
 
-        public Controller(ILocalizationService localization)
+        public Controller()
         {
-            _localization = localization;
-            _view = new View(_localization);
-            _backupService = new BackupService(_localization); 
+            _view = new View();
+            _backupService = new BackupService(); 
             Run();
         }
 
@@ -49,7 +46,7 @@ namespace EasySave.Controllers
                         Environment.Exit(0);
                         break;
                     default:
-                        _view.ShowError("invalidOption");
+                        _view.ShowMessage("Invalid option. Please try again.");
                         break;
                 }
             }
@@ -63,13 +60,6 @@ namespace EasySave.Controllers
 
         private void AddBackup()
         {
-            var currentBackups = _backupService.GetAllBackups();
-            if (currentBackups.Count >= BackupService.MaxBackups)
-            {
-                _view.ShowError("MaximumBackupsReached");
-                return;
-            }
-
             var (name, source, target, type) = _view.GetBackupInfo();
             var newBackup = new Backup(name, source, target, type);
 

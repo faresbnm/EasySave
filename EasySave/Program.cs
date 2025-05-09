@@ -1,5 +1,6 @@
 ﻿using System;
 using EasySave.Controllers;
+using EasySave.Localization;
 
 namespace EasySave
 {
@@ -7,11 +8,18 @@ namespace EasySave
     {
         static void Main(string[] args)
         {
-            // Initialize the Controller which will handle the application flow
-            new Controller();
+            // Initialize localization
+            var localization = new JsonLocalizationService();
 
-            // Note: The Console.ReadKey() from your original version is no longer needed here
-            // because the Controller's Run() method now contains the main application loop
+            // Language selection
+            Console.WriteLine("Choose language / Choisissez la langue:");
+            Console.WriteLine("1. English");
+            Console.WriteLine("2. Français");
+
+            var choice = Console.ReadLine();
+            localization.SetLanguage(choice == "2" ? "fr" : "en");
+
+            new Controller(localization);
         }
     }
 }
