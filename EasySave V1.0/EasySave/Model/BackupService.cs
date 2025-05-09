@@ -1,0 +1,477 @@
+﻿using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+using System.Text.Json;
+using System.Text.Json.Serialization;
+using EasySave.Localization;
+using EasySave.Logging;
+
+namespace EasySave.Model
+{
+    internal class BackupService
+    {
+        private readonly string _jsonFilePath;
+        private readonly JsonSerializerOptions _jsonOptions;
+        public const int MaxBackups = 5;
+        private readonly ILogger _logger;
+        private readonly IStateTracker _stateTracker;
+        private readonly ILocalizationService _localization;
+
+
+        public BackupService(ILocalizationService localization)
+        {
+            string directoryPath = Path.Combine(
+                Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments),
+                "9raya",
+                "Livrable",
+                "Backups");
+
+            Directory.CreateDirectory(directoryPath);
+            _jsonFilePath = Path.Combine(directoryPath, "backups.json");
+
+            _jsonOptions = new JsonSerializerOptions
+            {
+                WriteIndented = true,
+                PropertyNameCaseInsensitive = true,
+                IncludeFields = true
+            };
+
+            _logger = new FileLogger(); // Initializing logger 
+            _stateTracker = new FileStateTracker(); // Initializing state tracker
+            _localization = localization; // Initializing language service
+
+        }
+
+        public List<Backup> GetAllBackups()
+        {
+            try
+            {
+                if (File.Exists(_jsonFilePath))
+                {
+                    string json = File.ReadAllText(_jsonFilePath);
+                    if (!string.IsNullOrWhiteSpace(json))
+                    {
+                        return JsonSerializer.Deserialize<List<Backup>>(json, _jsonOptions) ?? new List<Backup>();
+                    }
+                }
+                return new List<Backup>();
+            }
+            catch (Exception ex)
+            {
+                return new List<Backup>();
+            }
+        }
+
+        public (bool isValid, string message) ValidateBackup(Backup newBackup)
+        {
+            var backups = GetAllBackups();
+
+            // Check maximum backups limit
+            if (backups.Count >= MaxBackups)
+            {
+                return (false, "MaximumBackupsReached");
+            }
+
+            // Check duplicate name
+            if (backups.Any(b => b.BackupName.Equals(newBackup.BackupName, StringComparison.OrdinalIgnoreCase)))
+            {
+                return (false, "BackupNameExists");
+            }
+
+            // Check source path
+            if (!Directory.Exists(newBackup.Source))
+            {
+                return (false, "SourcePathNotExist");
+            }
+
+            // Check target path
+            if (!Directory.Exists(newBackup.Target))
+            {
+                return (false, "TargetPathNotExist");
+            }
+
+            // Check backup type
+            if (newBackup.Type != 1 && newBackup.Type != 2)
+            {
+                return (false, "InvalidBackupType");
+            }
+
+            return (true, "BackupValid");
+        }
+
+        public (bool isValid, string message) ValidateUpdatedBackup(Backup newBackup)
+        {
+            var backups = GetAllBackups();
+            // Check source path
+            if (!Directory.Exists(newBackup.Source))
+            {
+                return (false, "SourcePathNotExist");
+            }
+
+            // Check target path
+            if (!Directory.Exists(newBackup.Target))
+            {
+                return (false, "TargetPathNotExist");
+            }
+
+            // Check backup type
+            if (newBackup.Type != 1 && newBackup.Type != 2)
+            {
+                return (false, "InvalidBackupType");
+            }
+
+            return (true, "BackupValid");
+        }
+
+        public string CreateBackup(Backup backup)
+        {
+            try
+            {
+                List<Backup> backups = GetAllBackups();
+                backups.Add(backup);
+
+                string json = JsonSerializer.Serialize(backups, _jsonOptions);
+                File.WriteAllText(_jsonFilePath, json);
+
+                return "BackupCreatedSuccess";
+            }
+            catch (Exception ex)
+            {
+                return "BackupCreateFailed";
+            }
+        }
+
+        public string DeleteBackup(string backupName)
+        {
+            try
+            {
+                var backups = GetAllBackups();
+                var backupToRemove = backups.FirstOrDefault(b =>
+                    b.BackupName.Equals(backupName, StringComparison.OrdinalIgnoreCase));
+
+                if (backupToRemove == null)
+                {
+                    return "BackupNotFound";
+                }
+
+                backups.Remove(backupToRemove);
+
+                var options = new JsonSerializerOptions { WriteIndented = true };
+                var json = JsonSerializer.Serialize(backups, options);
+                File.WriteAllText(_jsonFilePath, json);
+
+                return "BackupDeleted";
+            }
+            catch (Exception ex)
+            {
+                return "Error";
+            }
+        }
+
+        public (Backup backup, string message) GetBackupByName(string backupName)
+        {
+            var backups = GetAllBackups();
+            var backup = backups.FirstOrDefault(b =>
+                b.BackupName.Equals(backupName, StringComparison.OrdinalIgnoreCase));
+
+            return backup == null
+                ? (null, "NoBackupsAvailable")
+                : (backup, "Backup found");
+        }
+
+        public string UpdateBackup(string originalName, Backup updatedBackup)
+        {
+            try
+            {
+                var backups = GetAllBackups();
+                var index = backups.FindIndex(b =>
+                    b.BackupName.Equals(originalName, StringComparison.OrdinalIgnoreCase));
+
+                if (index == -1) return "BackupNotFound";
+
+                backups[index] = updatedBackup;
+
+                var options = new JsonSerializerOptions { WriteIndented = true };
+                var json = JsonSerializer.Serialize(backups, options);
+                File.WriteAllText(_jsonFilePath, json);
+
+                return "BackupUpdatedSuccess";
+            }
+            catch (Exception ex)
+            {
+                return "Error";
+            }
+        }
+
+        public string GetTimestampedFolderName(string backupName)
+        {
+            return $"{backupName}_{DateTime.Now:dd-MM-yyyy_HH-mm-ss}";
+        }
+
+        public (List<string> backupNames, string error) ParseBackupSelection(string input, List<Backup> allBackups)
+        {
+            if (string.IsNullOrWhiteSpace(input))
+                return (null, "EmptyInput");
+
+            if (input.Equals("all", StringComparison.OrdinalIgnoreCase))
+                return (allBackups.Select(b => b.BackupName).ToList(), null);
+
+            var results = new List<string>();
+            var parts = input.Split(new[] { ',', '-' }, StringSplitOptions.RemoveEmptyEntries);
+
+            if (parts.Length == 0)
+                return (null, "InvalidInputFormat");
+
+            // Handle comma-separated list
+            if (input.Contains(','))
+            {
+                foreach (var part in parts)
+                {
+                    if (int.TryParse(part, out int index) && index > 0 && index <= allBackups.Count)
+                        results.Add(allBackups[index - 1].BackupName);
+                    else
+                        return (null, "InvalidBackupNumber");
+                }
+                return (results, null);
+            }
+
+            // Handle range (e.g., 2-4)
+            if (input.Contains('-') && parts.Length == 2)
+            {
+                if (int.TryParse(parts[0], out int start) && int.TryParse(parts[1], out int end) &&
+                    start > 0 && end <= allBackups.Count && start <= end)
+                {
+                    for (int i = start; i <= end; i++)
+                        results.Add(allBackups[i - 1].BackupName);
+                    return (results, null);
+                }
+                return (null, "InvalidRange");
+            }
+
+            // Handle single number
+            if (int.TryParse(input, out int singleIndex) && singleIndex > 0 && singleIndex <= allBackups.Count)
+                return (new List<string> { allBackups[singleIndex - 1].BackupName }, null);
+
+            return (null, "InvalidInput");
+        }
+
+        public List<string> ExecuteBackups(List<string> backupNames)
+        {
+            var results = new List<string>();
+
+            foreach (var backupName in backupNames)
+            {
+                try
+                {
+                    var (backup, message) = GetBackupByName(backupName);
+                    if (backup == null)
+                    {
+                        results.Add(_localization.Format("BackupNotFound", backupName));
+                        continue;
+                    }
+
+                    //initialize state
+                    _stateTracker.InitializeState(backup.BackupName);
+
+                    if (backup.Type == 1) // Full backup
+                    {
+                        // Count files and total size first
+                        var fileCount = CountFiles(backup.Source);
+                        _stateTracker.UpdateState(backup.BackupName, "Preparing",
+                            fileCount.Count, fileCount.TotalSize);
+
+                        CopyDirectory(backup.Source, backup.Target, backup.BackupName, true, null);
+                        results.Add(_localization.Format("FullBackupSuccess", backup.BackupName));
+
+                        _stateTracker.UpdateState(backup.BackupName, "Completed");
+                    }
+                    else // Differential backup
+                    {
+                        string originalBackupPath = FindOriginalFullBackup(backup.Target, backup.BackupName);
+                        if (originalBackupPath == null)
+                        {
+                            // Count files and total size first
+                            var fileCount = CountFiles(backup.Source);
+                            _stateTracker.UpdateState(backup.BackupName, "Preparing",
+                                fileCount.Count, fileCount.TotalSize);
+
+                            CopyDirectory(backup.Source, backup.Target, backup.BackupName, true, null);
+                            results.Add(_localization.Format("DifferentialBackupSuccess", backup.BackupName));
+                            _stateTracker.UpdateState(backup.BackupName, "Completed");
+                        }
+                        else
+                        {
+                            // Count changed files and total size first
+                            var fileCount = CountChangedFiles(backup.Source, originalBackupPath);
+                            _stateTracker.UpdateState(backup.BackupName, "Preparing",
+                                fileCount.Count, fileCount.TotalSize);
+
+                            CopyDirectory(backup.Source, backup.Target, backup.BackupName, false, originalBackupPath);
+                            results.Add($"Differential backup '{backup.BackupName}' executed successfully");
+                            _stateTracker.UpdateState(backup.BackupName, "Completed");
+                        }
+                    }
+                }
+                catch (Exception ex)
+                {
+                    results.Add($"Failed to execute backup '{backupName}': {ex.Message}");
+                }
+            }
+
+            return results;
+        }
+
+        // Count files and total size in a directory
+        private (int Count, long TotalSize) CountFiles(string directory)
+        {
+            int count = 0;
+            long totalSize = 0;
+
+            foreach (var file in Directory.GetFiles(directory, "*", SearchOption.AllDirectories))
+            {
+                count++;
+                totalSize += new FileInfo(file).Length;
+            }
+
+            return (count, totalSize);
+        }
+
+        // Count changed files and total size in a directory compared to the last full backup
+        private (int Count, long TotalSize) CountChangedFiles(string sourceDir, string lastBackupPath)
+        {
+            int count = 0;
+            long totalSize = 0;
+
+            foreach (var file in Directory.GetFiles(sourceDir, "*", SearchOption.AllDirectories))
+            {
+                string relativePath = file.Substring(sourceDir.Length + 1);
+                string lastBackupFile = Path.Combine(lastBackupPath, relativePath);
+
+                if (!File.Exists(lastBackupFile) || File.GetLastWriteTime(file) > File.GetLastWriteTime(lastBackupFile))
+                {
+                    count++;
+                    totalSize += new FileInfo(file).Length;
+                }
+            }
+
+            return (count, totalSize);
+        }
+
+        private string FindOriginalFullBackup(string targetDir, string backupName)
+        {
+            try
+            {
+                return Directory.GetDirectories(targetDir)
+                    .Where(d => Path.GetFileName(d).StartsWith(backupName + "_"))
+                    .OrderBy(d => Directory.GetCreationTime(d)) // Get the oldest backup
+                    .FirstOrDefault(); // This will be the original full backup
+            }
+            catch
+            {
+                return null;
+            }
+        }
+
+        private void CopyDirectory(string sourceDir, string targetDir, string backupName, bool isFullBackup, string lastBackupPath)
+        {
+            string timestampedFolder = GetTimestampedFolderName(backupName);
+            string backupTargetDir = Path.Combine(targetDir, timestampedFolder);
+
+            bool hasChanges = false;
+
+            // First pass: check if there are any changes
+            if (!isFullBackup && lastBackupPath != null)
+            {
+                hasChanges = Directory.GetFiles(sourceDir, "*", SearchOption.AllDirectories)
+                    .Any(file => {
+                        string relativePath = file.Substring(sourceDir.Length + 1);
+                        string lastBackupFile = Path.Combine(lastBackupPath, relativePath);
+                        return !File.Exists(lastBackupFile) ||
+                               File.GetLastWriteTime(file) > File.GetLastWriteTime(lastBackupFile);
+                    });
+            }
+            else
+            {
+                hasChanges = true; // Full backup always has "changes"
+            }
+
+            if (!hasChanges)
+            {
+                _stateTracker.UpdateState(backupName, "NoChanges");
+                return; // No changes, skip backup
+            }
+
+            // Second pass: actually copy files
+            Directory.CreateDirectory(backupTargetDir);
+            var files = Directory.GetFiles(sourceDir);
+            for (int i = 0; i < files.Length; i++)
+            {
+                string file = files[i];
+                string fileName = Path.GetFileName(file);
+                string destFile = Path.Combine(backupTargetDir, fileName);
+
+                bool shouldCopy = isFullBackup;
+
+                if (!isFullBackup)
+                {
+                    string lastBackupFile = Path.Combine(lastBackupPath, fileName);
+                    shouldCopy = !File.Exists(lastBackupFile) ||
+                                File.GetLastWriteTime(file) > File.GetLastWriteTime(lastBackupFile);
+                }
+
+                if (shouldCopy)
+                {
+                    try
+                    {
+                        // Update state before copying
+                        _stateTracker.UpdateState(backupName, "InProgress",
+                            currentSource: file, currentTarget: destFile);
+
+                        var startTime = DateTime.Now;
+                        File.Copy(file, destFile, true);
+                        var endTime = DateTime.Now;
+
+                        // Log the file transfer
+                        var fileInfo = new FileInfo(file);
+                        _logger.LogTransfer(
+                            backupName,
+                            file,
+                            destFile,
+                            fileInfo.Length,
+                            (endTime - startTime).TotalMilliseconds
+                        );
+
+                        // Update state after successful copy
+                        _stateTracker.UpdateState(backupName, "InProgress",
+                            filesCopied: i + 1, sizeCopied: fileInfo.Length);
+                    }
+                    catch (Exception ex)
+                    {
+                        // Log failed transfer with negative transfer time
+                        _logger.LogTransfer(
+                            backupName,
+                            file,
+                            destFile,
+                            new FileInfo(file).Length,
+                            -1 // Negative value indicates failure
+                        );
+
+                        _stateTracker.UpdateState(backupName, "Error",
+                            currentSource: file, currentTarget: destFile);
+                    }
+                }
+            }
+
+            // Handle subdirectories
+            foreach (var subDir in Directory.GetDirectories(sourceDir))
+            {
+                string dirName = Path.GetFileName(subDir);
+                string destSubDir = Path.Combine(backupTargetDir, dirName);
+                string lastBackupSubDir = lastBackupPath != null ? Path.Combine(lastBackupPath, dirName) : null;
+
+                CopyDirectory(subDir, destSubDir, backupName, isFullBackup, lastBackupSubDir);
+            }
+        }
+    }
+}
