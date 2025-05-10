@@ -17,8 +17,11 @@ Multilingual support (FR/EN)
 Modular design for future GUI (v2.0)
 
 Note: you can find Log and state files in:
+
 C:\ProgramData\EasySave\ For windows
+
 /Library/Application Support/EasySave/ For macos
+
 /usr/share/EasySave/ For linux
 
 # Prerequisites
