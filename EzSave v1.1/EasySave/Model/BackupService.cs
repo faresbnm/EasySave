@@ -14,7 +14,7 @@ namespace EasySave.Model
         private readonly string _jsonFilePath;
         private readonly JsonSerializerOptions _jsonOptions;
         public const int MaxBackups = 5;
-        private readonly ILogger _logger;
+        private ILogger _logger;
         private readonly IStateTracker _stateTracker;
         private readonly ILocalizationService _localization;
 
@@ -41,6 +41,21 @@ namespace EasySave.Model
             _stateTracker = new FileStateTracker(); // Initializing state tracker
             _localization = localization; // Initializing language service
 
+        }
+
+        public void SetLogFormat(LogFormat format)
+        {
+            if (_logger != null && _logger.Format == format)
+                return;
+
+            if (format == LogFormat.Json)
+            {
+                _logger = new FileLogger();
+            }
+            else
+            {
+                _logger = new XmlLogger();
+            }
         }
 
         public List<Backup> GetAllBackups()

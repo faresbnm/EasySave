@@ -6,7 +6,7 @@
     "MenuOption3": "3- Update a job",
     "MenuOption4": "4- Delete a job",
     "MenuOption5": "5- Execute a job",
-    "MenuOption6": "6- Exit",
+    "MenuOption7": "7- Exit",
     "SelectOption": "Select an option: ",
     "NewBackupTitle": "[+] New Backup",
     "EnterBackupName": "Enter the backup name: ",
@@ -69,5 +69,9 @@
     "NamePrompt": "Enter backup name [{0}]: ",
     "SourcePrompt": "Enter backup source [{0}]: ",
     "TargetPrompt": "Enter backup target [{0}]: ",
-    "TypePrompt": "Enter backup type [{0}]: "
+    "TypePrompt": "Enter backup type [{0}]: ",
+    "MenuOption6": "6- Change log format",
+    "LogFormatTitle": "Select log format:",
+    "LogFormatChanged": "Log format changed successfully",
+    "InvalidLogFormat": "Invalid log format selection"
 }

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using EasySave.Localization;
+using EasySave.Logging;
 using EasySave.Model;
 
 namespace EasySave.Views
@@ -26,7 +27,31 @@ namespace EasySave.Views
             Console.WriteLine(_localization["MenuOption4"]);
             Console.WriteLine(_localization["MenuOption5"]);
             Console.WriteLine(_localization["MenuOption6"]);
+            Console.WriteLine(_localization["MenuOption7"]); 
             Console.Write("\n" + _localization["SelectOption"]);
+        }
+
+        public LogFormat? GetLogFormatSelection()
+        {
+            Console.Clear();
+            Console.WriteLine(_localization["LogFormatTitle"]);
+            Console.WriteLine("1. JSON");
+            Console.WriteLine("2. XML");
+            Console.Write(_localization["SelectOption"]);
+
+            var input = Console.ReadLine();
+            if (input == "1")
+            {
+                return LogFormat.Json;
+            }
+            else if (input == "2")
+            {
+                return LogFormat.Xml;
+            }
+            else
+            {
+                return null;
+            }
         }
 
         public (string name, string source, string target, int type) GetBackupInfo()
