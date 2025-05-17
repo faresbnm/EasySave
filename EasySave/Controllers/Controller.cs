@@ -46,6 +46,9 @@ namespace EasySave.Controllers
                         ExecuteBackup();
                         break;
                     case "6":
+                        ChangeLogFormat();
+                        break;
+                    case "7":
                         Environment.Exit(0);
                         break;
                     default:
@@ -59,6 +62,20 @@ namespace EasySave.Controllers
         {
             var backups = _backupService.GetAllBackups();
             _view.ListBackups(backups);
+        }
+
+        private void ChangeLogFormat()
+        {
+            var format = _view.GetLogFormatSelection();
+            if (format.HasValue)
+            {
+                _backupService.SetLogFormat(format.Value);
+                _view.ShowMessage("LogFormatChanged");
+            }
+            else
+            {
+                _view.ShowError("InvalidLogFormat");
+            }
         }
 
         private void AddBackup()

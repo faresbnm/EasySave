@@ -6,7 +6,7 @@
     "MenuOption3": "3- Modifier une sauvegarde",
     "MenuOption4": "4- Supprimer une sauvegarde",
     "MenuOption5": "5- Executer une sauvegarde",
-    "MenuOption6": "6- Quitter",
+    "MenuOption7": "7- Quitter",
     "SelectOption": "Choisissez une option : ",
     "NewBackupTitle": "[+] Nouvelle sauvegarde",
     "EnterBackupName": "Entrez le nom de la sauvegarde : ",
@@ -69,5 +69,9 @@
     "NamePrompt": "Entrer le nom de la sauvegarde [{0}]: ",
     "SourcePrompt": "Entrer la source [{0}]: ",
     "TargetPrompt": "Enter la cible [{0}]: ",
-    "TypePrompt": "Enter le type [{0}]: "
+    "TypePrompt": "Enter le type [{0}]: ",
+    "MenuOption6": "6- Changer le format de journal",
+    "LogFormatTitle": "Sélectionnez le format de journal :",
+    "LogFormatChanged": "Format de journal modifié avec succès",
+    "InvalidLogFormat": "Sélection de format de journal invalide"
 }

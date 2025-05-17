@@ -8,6 +8,7 @@ namespace EasySave.Logging
     {
         private readonly string _logDirectory;
         private readonly JsonSerializerOptions _jsonOptions;
+        public LogFormat Format { get; set; } = LogFormat.Json;
 
         public FileLogger()
         {
