@@ -1,0 +1,80 @@
+C:\Users\dell\Documents\9raya\Livrable\EasySaveCore\EasySave\EasySave\obj\Debug\net9.0\EasySave.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\dell\Documents\9raya\Livrable\EasySaveCore\EasySave\EasySave\obj\Debug\net9.0\EasySave.AssemblyInfoInputs.cache
+C:\Users\dell\Documents\9raya\Livrable\EasySaveCore\EasySave\EasySave\obj\Debug\net9.0\EasySave.AssemblyInfo.cs
+C:\Users\dell\Documents\9raya\Livrable\EasySaveCore\EasySave\EasySave\obj\Debug\net9.0\EasySave.csproj.CoreCompileInputs.cache
+C:\Users\dell\Documents\9raya\Livrable\EasySaveCore\EasySave\EasySave\bin\Debug\net9.0\EasySave.exe
+C:\Users\dell\Documents\9raya\Livrable\EasySaveCore\EasySave\EasySave\bin\Debug\net9.0\EasySave.deps.json
+C:\Users\dell\Documents\9raya\Livrable\EasySaveCore\EasySave\EasySave\bin\Debug\net9.0\EasySave.runtimeconfig.json
+C:\Users\dell\Documents\9raya\Livrable\EasySaveCore\EasySave\EasySave\bin\Debug\net9.0\EasySave.dll
+C:\Users\dell\Documents\9raya\Livrable\EasySaveCore\EasySave\EasySave\bin\Debug\net9.0\EasySave.pdb
+C:\Users\dell\Documents\9raya\Livrable\EasySaveCore\EasySave\EasySave\bin\Debug\net9.0\EasySave.Logging.dll
+C:\Users\dell\Documents\9raya\Livrable\EasySaveCore\EasySave\EasySave\bin\Debug\net9.0\EasySave.Logging.pdb
+C:\Users\dell\Documents\9raya\Livrable\EasySaveCore\EasySave\EasySave\obj\Debug\net9.0\EasySave.csproj.AssemblyReference.cache
+C:\Users\dell\Documents\9raya\Livrable\EasySaveCore\EasySave\EasySave\obj\Debug\net9.0\EasySave.csproj.Up2Date
+C:\Users\dell\Documents\9raya\Livrable\EasySaveCore\EasySave\EasySave\obj\Debug\net9.0\EasySave.dll
+C:\Users\dell\Documents\9raya\Livrable\EasySaveCore\EasySave\EasySave\obj\Debug\net9.0\refint\EasySave.dll
+C:\Users\dell\Documents\9raya\Livrable\EasySaveCore\EasySave\EasySave\obj\Debug\net9.0\EasySave.pdb
+C:\Users\dell\Documents\9raya\Livrable\EasySaveCore\EasySave\EasySave\obj\Debug\net9.0\EasySave.genruntimeconfig.cache
+C:\Users\dell\Documents\9raya\Livrable\EasySaveCore\EasySave\EasySave\obj\Debug\net9.0\ref\EasySave.dll
+C:\Users\dell\Documents\9raya\Livrable\EasySaveCore\EasySave\EasySave\bin\Debug\net9.0\Languages\fr.json
+C:\Users\dell\Documents\9raya\Livrable\EasySaveCore\EasySave\EasySave\bin\Debug\net9.0\Languages\en.json
+C:\Users\asust\OneDrive\Desktop\Livrable\EasySaveCore\EasySave\EasySave\bin\Debug\net9.0\EasySave.exe
+C:\Users\asust\OneDrive\Desktop\Livrable\EasySaveCore\EasySave\EasySave\bin\Debug\net9.0\Languages\en.json
+C:\Users\asust\OneDrive\Desktop\Livrable\EasySaveCore\EasySave\EasySave\bin\Debug\net9.0\Languages\fr.json
+C:\Users\asust\OneDrive\Desktop\Livrable\EasySaveCore\EasySave\EasySave\bin\Debug\net9.0\EasySave.deps.json
+C:\Users\asust\OneDrive\Desktop\Livrable\EasySaveCore\EasySave\EasySave\bin\Debug\net9.0\EasySave.runtimeconfig.json
+C:\Users\asust\OneDrive\Desktop\Livrable\EasySaveCore\EasySave\EasySave\bin\Debug\net9.0\EasySave.dll
+C:\Users\asust\OneDrive\Desktop\Livrable\EasySaveCore\EasySave\EasySave\bin\Debug\net9.0\EasySave.pdb
+C:\Users\asust\OneDrive\Desktop\Livrable\EasySaveCore\EasySave\EasySave\bin\Debug\net9.0\EasySave.Logging.dll
+C:\Users\asust\OneDrive\Desktop\Livrable\EasySaveCore\EasySave\EasySave\bin\Debug\net9.0\EasySave.Logging.pdb
+C:\Users\asust\OneDrive\Desktop\Livrable\EasySaveCore\EasySave\EasySave\obj\Debug\net9.0\EasySave.csproj.AssemblyReference.cache
+C:\Users\asust\OneDrive\Desktop\Livrable\EasySaveCore\EasySave\EasySave\obj\Debug\net9.0\EasySave.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\asust\OneDrive\Desktop\Livrable\EasySaveCore\EasySave\EasySave\obj\Debug\net9.0\EasySave.AssemblyInfoInputs.cache
+C:\Users\asust\OneDrive\Desktop\Livrable\EasySaveCore\EasySave\EasySave\obj\Debug\net9.0\EasySave.AssemblyInfo.cs
+C:\Users\asust\OneDrive\Desktop\Livrable\EasySaveCore\EasySave\EasySave\obj\Debug\net9.0\EasySave.csproj.CoreCompileInputs.cache
+C:\Users\asust\OneDrive\Desktop\Livrable\EasySaveCore\EasySave\EasySave\obj\Debug\net9.0\EasySave.csproj.Up2Date
+C:\Users\asust\OneDrive\Desktop\Livrable\EasySaveCore\EasySave\EasySave\obj\Debug\net9.0\EasySave.dll
+C:\Users\asust\OneDrive\Desktop\Livrable\EasySaveCore\EasySave\EasySave\obj\Debug\net9.0\refint\EasySave.dll
+C:\Users\asust\OneDrive\Desktop\Livrable\EasySaveCore\EasySave\EasySave\obj\Debug\net9.0\EasySave.pdb
+C:\Users\asust\OneDrive\Desktop\Livrable\EasySaveCore\EasySave\EasySave\obj\Debug\net9.0\EasySave.genruntimeconfig.cache
+C:\Users\asust\OneDrive\Desktop\Livrable\EasySaveCore\EasySave\EasySave\obj\Debug\net9.0\ref\EasySave.dll
+C:\Users\asust\OneDrive\Desktop\EasySave\EasySave\bin\Debug\net9.0\EasySave.exe
+C:\Users\asust\OneDrive\Desktop\EasySave\EasySave\bin\Debug\net9.0\Languages\en.json
+C:\Users\asust\OneDrive\Desktop\EasySave\EasySave\bin\Debug\net9.0\Languages\fr.json
+C:\Users\asust\OneDrive\Desktop\EasySave\EasySave\bin\Debug\net9.0\EasySave.deps.json
+C:\Users\asust\OneDrive\Desktop\EasySave\EasySave\bin\Debug\net9.0\EasySave.runtimeconfig.json
+C:\Users\asust\OneDrive\Desktop\EasySave\EasySave\bin\Debug\net9.0\EasySave.dll
+C:\Users\asust\OneDrive\Desktop\EasySave\EasySave\bin\Debug\net9.0\EasySave.pdb
+C:\Users\asust\OneDrive\Desktop\EasySave\EasySave\bin\Debug\net9.0\EasySave.Logging.dll
+C:\Users\asust\OneDrive\Desktop\EasySave\EasySave\bin\Debug\net9.0\EasySave.Logging.pdb
+C:\Users\asust\OneDrive\Desktop\EasySave\EasySave\obj\Debug\net9.0\EasySave.csproj.AssemblyReference.cache
+C:\Users\asust\OneDrive\Desktop\EasySave\EasySave\obj\Debug\net9.0\EasySave.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\asust\OneDrive\Desktop\EasySave\EasySave\obj\Debug\net9.0\EasySave.AssemblyInfoInputs.cache
+C:\Users\asust\OneDrive\Desktop\EasySave\EasySave\obj\Debug\net9.0\EasySave.AssemblyInfo.cs
+C:\Users\asust\OneDrive\Desktop\EasySave\EasySave\obj\Debug\net9.0\EasySave.csproj.CoreCompileInputs.cache
+C:\Users\asust\OneDrive\Desktop\EasySave\EasySave\obj\Debug\net9.0\EasySave.csproj.Up2Date
+C:\Users\asust\OneDrive\Desktop\EasySave\EasySave\obj\Debug\net9.0\EasySave.dll
+C:\Users\asust\OneDrive\Desktop\EasySave\EasySave\obj\Debug\net9.0\refint\EasySave.dll
+C:\Users\asust\OneDrive\Desktop\EasySave\EasySave\obj\Debug\net9.0\EasySave.pdb
+C:\Users\asust\OneDrive\Desktop\EasySave\EasySave\obj\Debug\net9.0\EasySave.genruntimeconfig.cache
+C:\Users\asust\OneDrive\Desktop\EasySave\EasySave\obj\Debug\net9.0\ref\EasySave.dll
+C:\Users\asust\OneDrive\Desktop\EasySave V1.9\EasySave\bin\Debug\net9.0\EasySave.exe
+C:\Users\asust\OneDrive\Desktop\EasySave V1.9\EasySave\bin\Debug\net9.0\Languages\en.json
+C:\Users\asust\OneDrive\Desktop\EasySave V1.9\EasySave\bin\Debug\net9.0\Languages\fr.json
+C:\Users\asust\OneDrive\Desktop\EasySave V1.9\EasySave\bin\Debug\net9.0\EasySave.deps.json
+C:\Users\asust\OneDrive\Desktop\EasySave V1.9\EasySave\bin\Debug\net9.0\EasySave.runtimeconfig.json
+C:\Users\asust\OneDrive\Desktop\EasySave V1.9\EasySave\bin\Debug\net9.0\EasySave.dll
+C:\Users\asust\OneDrive\Desktop\EasySave V1.9\EasySave\bin\Debug\net9.0\EasySave.pdb
+C:\Users\asust\OneDrive\Desktop\EasySave V1.9\EasySave\bin\Debug\net9.0\EasySave.Logging.dll
+C:\Users\asust\OneDrive\Desktop\EasySave V1.9\EasySave\bin\Debug\net9.0\EasySave.Logging.pdb
+C:\Users\asust\OneDrive\Desktop\EasySave V1.9\EasySave\obj\Debug\net9.0\EasySave.csproj.AssemblyReference.cache
+C:\Users\asust\OneDrive\Desktop\EasySave V1.9\EasySave\obj\Debug\net9.0\EasySave.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\asust\OneDrive\Desktop\EasySave V1.9\EasySave\obj\Debug\net9.0\EasySave.AssemblyInfoInputs.cache
+C:\Users\asust\OneDrive\Desktop\EasySave V1.9\EasySave\obj\Debug\net9.0\EasySave.AssemblyInfo.cs
+C:\Users\asust\OneDrive\Desktop\EasySave V1.9\EasySave\obj\Debug\net9.0\EasySave.csproj.CoreCompileInputs.cache
+C:\Users\asust\OneDrive\Desktop\EasySave V1.9\EasySave\obj\Debug\net9.0\EasySave.csproj.Up2Date
+C:\Users\asust\OneDrive\Desktop\EasySave V1.9\EasySave\obj\Debug\net9.0\EasySave.dll
+C:\Users\asust\OneDrive\Desktop\EasySave V1.9\EasySave\obj\Debug\net9.0\refint\EasySave.dll
+C:\Users\asust\OneDrive\Desktop\EasySave V1.9\EasySave\obj\Debug\net9.0\EasySave.pdb
+C:\Users\asust\OneDrive\Desktop\EasySave V1.9\EasySave\obj\Debug\net9.0\EasySave.genruntimeconfig.cache
+C:\Users\asust\OneDrive\Desktop\EasySave V1.9\EasySave\obj\Debug\net9.0\ref\EasySave.dll

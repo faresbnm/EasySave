@@ -1,0 +1,11 @@
+{
+  "version": 2,
+  "dgSpecHash": "BA29UUd517g=",
+  "success": true,
+  "projectFilePath": "C:\\Users\\asust\\OneDrive\\Desktop\\EasySave V1.9\\EasySaveWPF\\EasySaveWPF.csproj",
+  "expectedPackageFiles": [
+    "C:\\Users\\asust\\.nuget\\packages\\microsoft.extensions.dependencyinjection\\9.0.5\\microsoft.extensions.dependencyinjection.9.0.5.nupkg.sha512",
+    "C:\\Users\\asust\\.nuget\\packages\\microsoft.extensions.dependencyinjection.abstractions\\9.0.5\\microsoft.extensions.dependencyinjection.abstractions.9.0.5.nupkg.sha512"
+  ],
+  "logs": []
+}

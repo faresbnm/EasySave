@@ -1,0 +1,44 @@
+C:\Users\dell\Documents\9raya\Livrable\EasySaveCore\EasySave\EasySave.Logging\bin\Debug\net9.0\EasySave.Logging.deps.json
+C:\Users\dell\Documents\9raya\Livrable\EasySaveCore\EasySave\EasySave.Logging\bin\Debug\net9.0\EasySave.Logging.dll
+C:\Users\dell\Documents\9raya\Livrable\EasySaveCore\EasySave\EasySave.Logging\bin\Debug\net9.0\EasySave.Logging.pdb
+C:\Users\dell\Documents\9raya\Livrable\EasySaveCore\EasySave\EasySave.Logging\obj\Debug\net9.0\EasySave.Logging.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\dell\Documents\9raya\Livrable\EasySaveCore\EasySave\EasySave.Logging\obj\Debug\net9.0\EasySave.Logging.AssemblyInfoInputs.cache
+C:\Users\dell\Documents\9raya\Livrable\EasySaveCore\EasySave\EasySave.Logging\obj\Debug\net9.0\EasySave.Logging.AssemblyInfo.cs
+C:\Users\dell\Documents\9raya\Livrable\EasySaveCore\EasySave\EasySave.Logging\obj\Debug\net9.0\EasySave.Logging.csproj.CoreCompileInputs.cache
+C:\Users\dell\Documents\9raya\Livrable\EasySaveCore\EasySave\EasySave.Logging\obj\Debug\net9.0\EasySave.Logging.dll
+C:\Users\dell\Documents\9raya\Livrable\EasySaveCore\EasySave\EasySave.Logging\obj\Debug\net9.0\refint\EasySave.Logging.dll
+C:\Users\dell\Documents\9raya\Livrable\EasySaveCore\EasySave\EasySave.Logging\obj\Debug\net9.0\EasySave.Logging.pdb
+C:\Users\dell\Documents\9raya\Livrable\EasySaveCore\EasySave\EasySave.Logging\obj\Debug\net9.0\ref\EasySave.Logging.dll
+C:\Users\asust\OneDrive\Desktop\Livrable\EasySaveCore\EasySave\EasySave.Logging\bin\Debug\net9.0\EasySave.Logging.deps.json
+C:\Users\asust\OneDrive\Desktop\Livrable\EasySaveCore\EasySave\EasySave.Logging\bin\Debug\net9.0\EasySave.Logging.dll
+C:\Users\asust\OneDrive\Desktop\Livrable\EasySaveCore\EasySave\EasySave.Logging\bin\Debug\net9.0\EasySave.Logging.pdb
+C:\Users\asust\OneDrive\Desktop\Livrable\EasySaveCore\EasySave\EasySave.Logging\obj\Debug\net9.0\EasySave.Logging.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\asust\OneDrive\Desktop\Livrable\EasySaveCore\EasySave\EasySave.Logging\obj\Debug\net9.0\EasySave.Logging.AssemblyInfoInputs.cache
+C:\Users\asust\OneDrive\Desktop\Livrable\EasySaveCore\EasySave\EasySave.Logging\obj\Debug\net9.0\EasySave.Logging.AssemblyInfo.cs
+C:\Users\asust\OneDrive\Desktop\Livrable\EasySaveCore\EasySave\EasySave.Logging\obj\Debug\net9.0\EasySave.Logging.csproj.CoreCompileInputs.cache
+C:\Users\asust\OneDrive\Desktop\Livrable\EasySaveCore\EasySave\EasySave.Logging\obj\Debug\net9.0\EasySave.Logging.dll
+C:\Users\asust\OneDrive\Desktop\Livrable\EasySaveCore\EasySave\EasySave.Logging\obj\Debug\net9.0\refint\EasySave.Logging.dll
+C:\Users\asust\OneDrive\Desktop\Livrable\EasySaveCore\EasySave\EasySave.Logging\obj\Debug\net9.0\EasySave.Logging.pdb
+C:\Users\asust\OneDrive\Desktop\Livrable\EasySaveCore\EasySave\EasySave.Logging\obj\Debug\net9.0\ref\EasySave.Logging.dll
+C:\Users\asust\OneDrive\Desktop\EasySave\EasySave.Logging\bin\Debug\net9.0\EasySave.Logging.deps.json
+C:\Users\asust\OneDrive\Desktop\EasySave\EasySave.Logging\bin\Debug\net9.0\EasySave.Logging.dll
+C:\Users\asust\OneDrive\Desktop\EasySave\EasySave.Logging\bin\Debug\net9.0\EasySave.Logging.pdb
+C:\Users\asust\OneDrive\Desktop\EasySave\EasySave.Logging\obj\Debug\net9.0\EasySave.Logging.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\asust\OneDrive\Desktop\EasySave\EasySave.Logging\obj\Debug\net9.0\EasySave.Logging.AssemblyInfoInputs.cache
+C:\Users\asust\OneDrive\Desktop\EasySave\EasySave.Logging\obj\Debug\net9.0\EasySave.Logging.AssemblyInfo.cs
+C:\Users\asust\OneDrive\Desktop\EasySave\EasySave.Logging\obj\Debug\net9.0\EasySave.Logging.csproj.CoreCompileInputs.cache
+C:\Users\asust\OneDrive\Desktop\EasySave\EasySave.Logging\obj\Debug\net9.0\EasySave.Logging.dll
+C:\Users\asust\OneDrive\Desktop\EasySave\EasySave.Logging\obj\Debug\net9.0\refint\EasySave.Logging.dll
+C:\Users\asust\OneDrive\Desktop\EasySave\EasySave.Logging\obj\Debug\net9.0\EasySave.Logging.pdb
+C:\Users\asust\OneDrive\Desktop\EasySave\EasySave.Logging\obj\Debug\net9.0\ref\EasySave.Logging.dll
+C:\Users\asust\OneDrive\Desktop\EasySave V1.9\EasySave.Logging\bin\Debug\net9.0\EasySave.Logging.deps.json
+C:\Users\asust\OneDrive\Desktop\EasySave V1.9\EasySave.Logging\bin\Debug\net9.0\EasySave.Logging.dll
+C:\Users\asust\OneDrive\Desktop\EasySave V1.9\EasySave.Logging\bin\Debug\net9.0\EasySave.Logging.pdb
+C:\Users\asust\OneDrive\Desktop\EasySave V1.9\EasySave.Logging\obj\Debug\net9.0\EasySave.Logging.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\asust\OneDrive\Desktop\EasySave V1.9\EasySave.Logging\obj\Debug\net9.0\EasySave.Logging.AssemblyInfoInputs.cache
+C:\Users\asust\OneDrive\Desktop\EasySave V1.9\EasySave.Logging\obj\Debug\net9.0\EasySave.Logging.AssemblyInfo.cs
+C:\Users\asust\OneDrive\Desktop\EasySave V1.9\EasySave.Logging\obj\Debug\net9.0\EasySave.Logging.csproj.CoreCompileInputs.cache
+C:\Users\asust\OneDrive\Desktop\EasySave V1.9\EasySave.Logging\obj\Debug\net9.0\EasySave.Logging.dll
+C:\Users\asust\OneDrive\Desktop\EasySave V1.9\EasySave.Logging\obj\Debug\net9.0\refint\EasySave.Logging.dll
+C:\Users\asust\OneDrive\Desktop\EasySave V1.9\EasySave.Logging\obj\Debug\net9.0\EasySave.Logging.pdb
+C:\Users\asust\OneDrive\Desktop\EasySave V1.9\EasySave.Logging\obj\Debug\net9.0\ref\EasySave.Logging.dll
