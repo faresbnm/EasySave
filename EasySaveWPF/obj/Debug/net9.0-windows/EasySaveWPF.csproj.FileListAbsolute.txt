@@ -1,0 +1,170 @@
+C:\Users\dell\Documents\9raya\Livrable\EasySaveCore\EasySave\EasySaveWPF\bin\Debug\net9.0-windows\EasySave.deps.json
+C:\Users\dell\Documents\9raya\Livrable\EasySaveCore\EasySave\EasySaveWPF\bin\Debug\net9.0-windows\EasySave.runtimeconfig.json
+C:\Users\dell\Documents\9raya\Livrable\EasySaveCore\EasySave\EasySaveWPF\bin\Debug\net9.0-windows\EasySave.exe
+C:\Users\dell\Documents\9raya\Livrable\EasySaveCore\EasySave\EasySaveWPF\bin\Debug\net9.0-windows\EasySaveWPF.exe
+C:\Users\dell\Documents\9raya\Livrable\EasySaveCore\EasySave\EasySaveWPF\bin\Debug\net9.0-windows\Languages\en.json
+C:\Users\dell\Documents\9raya\Livrable\EasySaveCore\EasySave\EasySaveWPF\bin\Debug\net9.0-windows\Languages\fr.json
+C:\Users\dell\Documents\9raya\Livrable\EasySaveCore\EasySave\EasySaveWPF\bin\Debug\net9.0-windows\EasySaveWPF.deps.json
+C:\Users\dell\Documents\9raya\Livrable\EasySaveCore\EasySave\EasySaveWPF\bin\Debug\net9.0-windows\EasySaveWPF.runtimeconfig.json
+C:\Users\dell\Documents\9raya\Livrable\EasySaveCore\EasySave\EasySaveWPF\bin\Debug\net9.0-windows\EasySaveWPF.dll
+C:\Users\dell\Documents\9raya\Livrable\EasySaveCore\EasySave\EasySaveWPF\bin\Debug\net9.0-windows\EasySaveWPF.pdb
+C:\Users\dell\Documents\9raya\Livrable\EasySaveCore\EasySave\EasySaveWPF\bin\Debug\net9.0-windows\Microsoft.Extensions.DependencyInjection.dll
+C:\Users\dell\Documents\9raya\Livrable\EasySaveCore\EasySave\EasySaveWPF\bin\Debug\net9.0-windows\Microsoft.Extensions.DependencyInjection.Abstractions.dll
+C:\Users\dell\Documents\9raya\Livrable\EasySaveCore\EasySave\EasySaveWPF\bin\Debug\net9.0-windows\EasySave.dll
+C:\Users\dell\Documents\9raya\Livrable\EasySaveCore\EasySave\EasySaveWPF\bin\Debug\net9.0-windows\EasySave.Logging.dll
+C:\Users\dell\Documents\9raya\Livrable\EasySaveCore\EasySave\EasySaveWPF\bin\Debug\net9.0-windows\EasySave.pdb
+C:\Users\dell\Documents\9raya\Livrable\EasySaveCore\EasySave\EasySaveWPF\bin\Debug\net9.0-windows\EasySave.Logging.pdb
+C:\Users\dell\Documents\9raya\Livrable\EasySaveCore\EasySave\EasySaveWPF\obj\Debug\net9.0-windows\EasySaveWPF.csproj.AssemblyReference.cache
+C:\Users\dell\Documents\9raya\Livrable\EasySaveCore\EasySave\EasySaveWPF\obj\Debug\net9.0-windows\Views\MainWindow.baml
+C:\Users\dell\Documents\9raya\Livrable\EasySaveCore\EasySave\EasySaveWPF\obj\Debug\net9.0-windows\Views\MainWindow.g.cs
+C:\Users\dell\Documents\9raya\Livrable\EasySaveCore\EasySave\EasySaveWPF\obj\Debug\net9.0-windows\App.g.cs
+C:\Users\dell\Documents\9raya\Livrable\EasySaveCore\EasySave\EasySaveWPF\obj\Debug\net9.0-windows\EasySaveWPF_MarkupCompile.cache
+C:\Users\dell\Documents\9raya\Livrable\EasySaveCore\EasySave\EasySaveWPF\obj\Debug\net9.0-windows\EasySaveWPF.g.resources
+C:\Users\dell\Documents\9raya\Livrable\EasySaveCore\EasySave\EasySaveWPF\obj\Debug\net9.0-windows\EasySaveWPF.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\dell\Documents\9raya\Livrable\EasySaveCore\EasySave\EasySaveWPF\obj\Debug\net9.0-windows\EasySaveWPF.AssemblyInfoInputs.cache
+C:\Users\dell\Documents\9raya\Livrable\EasySaveCore\EasySave\EasySaveWPF\obj\Debug\net9.0-windows\EasySaveWPF.AssemblyInfo.cs
+C:\Users\dell\Documents\9raya\Livrable\EasySaveCore\EasySave\EasySaveWPF\obj\Debug\net9.0-windows\EasySaveWPF.csproj.CoreCompileInputs.cache
+C:\Users\dell\Documents\9raya\Livrable\EasySaveCore\EasySave\EasySaveWPF\obj\Debug\net9.0-windows\EasySave.EAE565E4.Up2Date
+C:\Users\dell\Documents\9raya\Livrable\EasySaveCore\EasySave\EasySaveWPF\obj\Debug\net9.0-windows\EasySaveWPF.dll
+C:\Users\dell\Documents\9raya\Livrable\EasySaveCore\EasySave\EasySaveWPF\obj\Debug\net9.0-windows\refint\EasySaveWPF.dll
+C:\Users\dell\Documents\9raya\Livrable\EasySaveCore\EasySave\EasySaveWPF\obj\Debug\net9.0-windows\EasySaveWPF.pdb
+C:\Users\dell\Documents\9raya\Livrable\EasySaveCore\EasySave\EasySaveWPF\obj\Debug\net9.0-windows\EasySaveWPF.genruntimeconfig.cache
+C:\Users\dell\Documents\9raya\Livrable\EasySaveCore\EasySave\EasySaveWPF\obj\Debug\net9.0-windows\ref\EasySaveWPF.dll
+C:\Users\dell\Documents\9raya\Livrable\EasySaveCore\EasySave\EasySaveWPF\obj\Debug\net9.0-windows\GeneratedInternalTypeHelper.g.cs
+C:\Users\dell\Documents\9raya\Livrable\EasySaveCore\EasySave\EasySaveWPF\obj\Debug\net9.0-windows\EasySaveWPF_MarkupCompile.lref
+C:\Users\asust\OneDrive\Desktop\Livrable\EasySaveCore\EasySave\EasySaveWPF\bin\Debug\net9.0-windows\EasySave.deps.json
+C:\Users\asust\OneDrive\Desktop\Livrable\EasySaveCore\EasySave\EasySaveWPF\bin\Debug\net9.0-windows\EasySave.runtimeconfig.json
+C:\Users\asust\OneDrive\Desktop\Livrable\EasySaveCore\EasySave\EasySaveWPF\bin\Debug\net9.0-windows\EasySave.exe
+C:\Users\asust\OneDrive\Desktop\Livrable\EasySaveCore\EasySave\EasySaveWPF\bin\Debug\net9.0-windows\EasySaveWPF.exe
+C:\Users\asust\OneDrive\Desktop\Livrable\EasySaveCore\EasySave\EasySaveWPF\bin\Debug\net9.0-windows\Languages\en.json
+C:\Users\asust\OneDrive\Desktop\Livrable\EasySaveCore\EasySave\EasySaveWPF\bin\Debug\net9.0-windows\Languages\fr.json
+C:\Users\asust\OneDrive\Desktop\Livrable\EasySaveCore\EasySave\EasySaveWPF\bin\Debug\net9.0-windows\EasySaveWPF.deps.json
+C:\Users\asust\OneDrive\Desktop\Livrable\EasySaveCore\EasySave\EasySaveWPF\bin\Debug\net9.0-windows\EasySaveWPF.runtimeconfig.json
+C:\Users\asust\OneDrive\Desktop\Livrable\EasySaveCore\EasySave\EasySaveWPF\bin\Debug\net9.0-windows\EasySaveWPF.dll
+C:\Users\asust\OneDrive\Desktop\Livrable\EasySaveCore\EasySave\EasySaveWPF\bin\Debug\net9.0-windows\EasySaveWPF.pdb
+C:\Users\asust\OneDrive\Desktop\Livrable\EasySaveCore\EasySave\EasySaveWPF\bin\Debug\net9.0-windows\Microsoft.Extensions.DependencyInjection.dll
+C:\Users\asust\OneDrive\Desktop\Livrable\EasySaveCore\EasySave\EasySaveWPF\bin\Debug\net9.0-windows\Microsoft.Extensions.DependencyInjection.Abstractions.dll
+C:\Users\asust\OneDrive\Desktop\Livrable\EasySaveCore\EasySave\EasySaveWPF\bin\Debug\net9.0-windows\EasySave.dll
+C:\Users\asust\OneDrive\Desktop\Livrable\EasySaveCore\EasySave\EasySaveWPF\bin\Debug\net9.0-windows\EasySave.Logging.dll
+C:\Users\asust\OneDrive\Desktop\Livrable\EasySaveCore\EasySave\EasySaveWPF\bin\Debug\net9.0-windows\EasySave.pdb
+C:\Users\asust\OneDrive\Desktop\Livrable\EasySaveCore\EasySave\EasySaveWPF\bin\Debug\net9.0-windows\EasySave.Logging.pdb
+C:\Users\asust\OneDrive\Desktop\Livrable\EasySaveCore\EasySave\EasySaveWPF\obj\Debug\net9.0-windows\EasySaveWPF.csproj.AssemblyReference.cache
+C:\Users\asust\OneDrive\Desktop\Livrable\EasySaveCore\EasySave\EasySaveWPF\obj\Debug\net9.0-windows\Views\MainWindow.g.cs
+C:\Users\asust\OneDrive\Desktop\Livrable\EasySaveCore\EasySave\EasySaveWPF\obj\Debug\net9.0-windows\App.g.cs
+C:\Users\asust\OneDrive\Desktop\Livrable\EasySaveCore\EasySave\EasySaveWPF\obj\Debug\net9.0-windows\GeneratedInternalTypeHelper.g.cs
+C:\Users\asust\OneDrive\Desktop\Livrable\EasySaveCore\EasySave\EasySaveWPF\obj\Debug\net9.0-windows\EasySaveWPF_MarkupCompile.cache
+C:\Users\asust\OneDrive\Desktop\Livrable\EasySaveCore\EasySave\EasySaveWPF\obj\Debug\net9.0-windows\EasySaveWPF_MarkupCompile.lref
+C:\Users\asust\OneDrive\Desktop\Livrable\EasySaveCore\EasySave\EasySaveWPF\obj\Debug\net9.0-windows\Views\MainWindow.baml
+C:\Users\asust\OneDrive\Desktop\Livrable\EasySaveCore\EasySave\EasySaveWPF\obj\Debug\net9.0-windows\EasySaveWPF.g.resources
+C:\Users\asust\OneDrive\Desktop\Livrable\EasySaveCore\EasySave\EasySaveWPF\obj\Debug\net9.0-windows\EasySaveWPF.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\asust\OneDrive\Desktop\Livrable\EasySaveCore\EasySave\EasySaveWPF\obj\Debug\net9.0-windows\EasySaveWPF.AssemblyInfoInputs.cache
+C:\Users\asust\OneDrive\Desktop\Livrable\EasySaveCore\EasySave\EasySaveWPF\obj\Debug\net9.0-windows\EasySaveWPF.AssemblyInfo.cs
+C:\Users\asust\OneDrive\Desktop\Livrable\EasySaveCore\EasySave\EasySaveWPF\obj\Debug\net9.0-windows\EasySaveWPF.csproj.CoreCompileInputs.cache
+C:\Users\asust\OneDrive\Desktop\Livrable\EasySaveCore\EasySave\EasySaveWPF\obj\Debug\net9.0-windows\EasySave.EAE565E4.Up2Date
+C:\Users\asust\OneDrive\Desktop\Livrable\EasySaveCore\EasySave\EasySaveWPF\obj\Debug\net9.0-windows\EasySaveWPF.dll
+C:\Users\asust\OneDrive\Desktop\Livrable\EasySaveCore\EasySave\EasySaveWPF\obj\Debug\net9.0-windows\refint\EasySaveWPF.dll
+C:\Users\asust\OneDrive\Desktop\Livrable\EasySaveCore\EasySave\EasySaveWPF\obj\Debug\net9.0-windows\EasySaveWPF.pdb
+C:\Users\asust\OneDrive\Desktop\Livrable\EasySaveCore\EasySave\EasySaveWPF\obj\Debug\net9.0-windows\EasySaveWPF.genruntimeconfig.cache
+C:\Users\asust\OneDrive\Desktop\Livrable\EasySaveCore\EasySave\EasySaveWPF\obj\Debug\net9.0-windows\ref\EasySaveWPF.dll
+C:\Users\asust\OneDrive\Desktop\EasySave\EasySaveWPF\bin\Debug\net9.0-windows\EasySave.deps.json
+C:\Users\asust\OneDrive\Desktop\EasySave\EasySaveWPF\bin\Debug\net9.0-windows\EasySave.runtimeconfig.json
+C:\Users\asust\OneDrive\Desktop\EasySave\EasySaveWPF\bin\Debug\net9.0-windows\EasySave.exe
+C:\Users\asust\OneDrive\Desktop\EasySave\EasySaveWPF\bin\Debug\net9.0-windows\EasySaveWPF.exe
+C:\Users\asust\OneDrive\Desktop\EasySave\EasySaveWPF\bin\Debug\net9.0-windows\Languages\en.json
+C:\Users\asust\OneDrive\Desktop\EasySave\EasySaveWPF\bin\Debug\net9.0-windows\Languages\fr.json
+C:\Users\asust\OneDrive\Desktop\EasySave\EasySaveWPF\bin\Debug\net9.0-windows\EasySaveWPF.deps.json
+C:\Users\asust\OneDrive\Desktop\EasySave\EasySaveWPF\bin\Debug\net9.0-windows\EasySaveWPF.runtimeconfig.json
+C:\Users\asust\OneDrive\Desktop\EasySave\EasySaveWPF\bin\Debug\net9.0-windows\EasySaveWPF.dll
+C:\Users\asust\OneDrive\Desktop\EasySave\EasySaveWPF\bin\Debug\net9.0-windows\EasySaveWPF.pdb
+C:\Users\asust\OneDrive\Desktop\EasySave\EasySaveWPF\bin\Debug\net9.0-windows\Microsoft.Extensions.DependencyInjection.dll
+C:\Users\asust\OneDrive\Desktop\EasySave\EasySaveWPF\bin\Debug\net9.0-windows\Microsoft.Extensions.DependencyInjection.Abstractions.dll
+C:\Users\asust\OneDrive\Desktop\EasySave\EasySaveWPF\bin\Debug\net9.0-windows\EasySave.dll
+C:\Users\asust\OneDrive\Desktop\EasySave\EasySaveWPF\bin\Debug\net9.0-windows\EasySave.Logging.dll
+C:\Users\asust\OneDrive\Desktop\EasySave\EasySaveWPF\bin\Debug\net9.0-windows\EasySave.pdb
+C:\Users\asust\OneDrive\Desktop\EasySave\EasySaveWPF\bin\Debug\net9.0-windows\EasySave.Logging.pdb
+C:\Users\asust\OneDrive\Desktop\EasySave\EasySaveWPF\obj\Debug\net9.0-windows\EasySaveWPF.csproj.AssemblyReference.cache
+C:\Users\asust\OneDrive\Desktop\EasySave\EasySaveWPF\obj\Debug\net9.0-windows\Views\MainWindow.g.cs
+C:\Users\asust\OneDrive\Desktop\EasySave\EasySaveWPF\obj\Debug\net9.0-windows\App.g.cs
+C:\Users\asust\OneDrive\Desktop\EasySave\EasySaveWPF\obj\Debug\net9.0-windows\GeneratedInternalTypeHelper.g.cs
+C:\Users\asust\OneDrive\Desktop\EasySave\EasySaveWPF\obj\Debug\net9.0-windows\EasySaveWPF_MarkupCompile.cache
+C:\Users\asust\OneDrive\Desktop\EasySave\EasySaveWPF\obj\Debug\net9.0-windows\EasySaveWPF_MarkupCompile.lref
+C:\Users\asust\OneDrive\Desktop\EasySave\EasySaveWPF\obj\Debug\net9.0-windows\Views\MainWindow.baml
+C:\Users\asust\OneDrive\Desktop\EasySave\EasySaveWPF\obj\Debug\net9.0-windows\EasySaveWPF.g.resources
+C:\Users\asust\OneDrive\Desktop\EasySave\EasySaveWPF\obj\Debug\net9.0-windows\EasySaveWPF.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\asust\OneDrive\Desktop\EasySave\EasySaveWPF\obj\Debug\net9.0-windows\EasySaveWPF.AssemblyInfoInputs.cache
+C:\Users\asust\OneDrive\Desktop\EasySave\EasySaveWPF\obj\Debug\net9.0-windows\EasySaveWPF.AssemblyInfo.cs
+C:\Users\asust\OneDrive\Desktop\EasySave\EasySaveWPF\obj\Debug\net9.0-windows\EasySaveWPF.csproj.CoreCompileInputs.cache
+C:\Users\asust\OneDrive\Desktop\EasySave\EasySaveWPF\obj\Debug\net9.0-windows\EasySave.EAE565E4.Up2Date
+C:\Users\asust\OneDrive\Desktop\EasySave\EasySaveWPF\obj\Debug\net9.0-windows\EasySaveWPF.dll
+C:\Users\asust\OneDrive\Desktop\EasySave\EasySaveWPF\obj\Debug\net9.0-windows\refint\EasySaveWPF.dll
+C:\Users\asust\OneDrive\Desktop\EasySave\EasySaveWPF\obj\Debug\net9.0-windows\EasySaveWPF.pdb
+C:\Users\asust\OneDrive\Desktop\EasySave\EasySaveWPF\obj\Debug\net9.0-windows\EasySaveWPF.genruntimeconfig.cache
+C:\Users\asust\OneDrive\Desktop\EasySave\EasySaveWPF\obj\Debug\net9.0-windows\ref\EasySaveWPF.dll
+C:\Users\asust\OneDrive\Desktop\EasySave V1.9\EasySaveWPF\bin\Debug\net9.0-windows\EasySave.deps.json
+C:\Users\asust\OneDrive\Desktop\EasySave V1.9\EasySaveWPF\bin\Debug\net9.0-windows\EasySave.runtimeconfig.json
+C:\Users\asust\OneDrive\Desktop\EasySave V1.9\EasySaveWPF\bin\Debug\net9.0-windows\EasySave.exe
+C:\Users\asust\OneDrive\Desktop\EasySave V1.9\EasySaveWPF\bin\Debug\net9.0-windows\EasySaveWPF.exe
+C:\Users\asust\OneDrive\Desktop\EasySave V1.9\EasySaveWPF\bin\Debug\net9.0-windows\Languages\en.json
+C:\Users\asust\OneDrive\Desktop\EasySave V1.9\EasySaveWPF\bin\Debug\net9.0-windows\Languages\fr.json
+C:\Users\asust\OneDrive\Desktop\EasySave V1.9\EasySaveWPF\bin\Debug\net9.0-windows\EasySaveWPF.deps.json
+C:\Users\asust\OneDrive\Desktop\EasySave V1.9\EasySaveWPF\bin\Debug\net9.0-windows\EasySaveWPF.runtimeconfig.json
+C:\Users\asust\OneDrive\Desktop\EasySave V1.9\EasySaveWPF\bin\Debug\net9.0-windows\EasySaveWPF.dll
+C:\Users\asust\OneDrive\Desktop\EasySave V1.9\EasySaveWPF\bin\Debug\net9.0-windows\EasySaveWPF.pdb
+C:\Users\asust\OneDrive\Desktop\EasySave V1.9\EasySaveWPF\bin\Debug\net9.0-windows\Microsoft.Extensions.DependencyInjection.dll
+C:\Users\asust\OneDrive\Desktop\EasySave V1.9\EasySaveWPF\bin\Debug\net9.0-windows\Microsoft.Extensions.DependencyInjection.Abstractions.dll
+C:\Users\asust\OneDrive\Desktop\EasySave V1.9\EasySaveWPF\bin\Debug\net9.0-windows\EasySave.dll
+C:\Users\asust\OneDrive\Desktop\EasySave V1.9\EasySaveWPF\bin\Debug\net9.0-windows\EasySave.Logging.dll
+C:\Users\asust\OneDrive\Desktop\EasySave V1.9\EasySaveWPF\bin\Debug\net9.0-windows\EasySave.pdb
+C:\Users\asust\OneDrive\Desktop\EasySave V1.9\EasySaveWPF\bin\Debug\net9.0-windows\EasySave.Logging.pdb
+C:\Users\asust\OneDrive\Desktop\EasySave V1.9\EasySaveWPF\obj\Debug\net9.0-windows\EasySaveWPF.csproj.AssemblyReference.cache
+C:\Users\asust\OneDrive\Desktop\EasySave V1.9\EasySaveWPF\obj\Debug\net9.0-windows\Views\MainWindow.g.cs
+C:\Users\asust\OneDrive\Desktop\EasySave V1.9\EasySaveWPF\obj\Debug\net9.0-windows\App.g.cs
+C:\Users\asust\OneDrive\Desktop\EasySave V1.9\EasySaveWPF\obj\Debug\net9.0-windows\GeneratedInternalTypeHelper.g.cs
+C:\Users\asust\OneDrive\Desktop\EasySave V1.9\EasySaveWPF\obj\Debug\net9.0-windows\EasySaveWPF_MarkupCompile.cache
+C:\Users\asust\OneDrive\Desktop\EasySave V1.9\EasySaveWPF\obj\Debug\net9.0-windows\EasySaveWPF_MarkupCompile.lref
+C:\Users\asust\OneDrive\Desktop\EasySave V1.9\EasySaveWPF\obj\Debug\net9.0-windows\Views\MainWindow.baml
+C:\Users\asust\OneDrive\Desktop\EasySave V1.9\EasySaveWPF\obj\Debug\net9.0-windows\EasySaveWPF.g.resources
+C:\Users\asust\OneDrive\Desktop\EasySave V1.9\EasySaveWPF\obj\Debug\net9.0-windows\EasySaveWPF.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\asust\OneDrive\Desktop\EasySave V1.9\EasySaveWPF\obj\Debug\net9.0-windows\EasySaveWPF.AssemblyInfoInputs.cache
+C:\Users\asust\OneDrive\Desktop\EasySave V1.9\EasySaveWPF\obj\Debug\net9.0-windows\EasySaveWPF.AssemblyInfo.cs
+C:\Users\asust\OneDrive\Desktop\EasySave V1.9\EasySaveWPF\obj\Debug\net9.0-windows\EasySaveWPF.csproj.CoreCompileInputs.cache
+C:\Users\asust\OneDrive\Desktop\EasySave V1.9\EasySaveWPF\obj\Debug\net9.0-windows\EasySave.EAE565E4.Up2Date
+C:\Users\asust\OneDrive\Desktop\EasySave V1.9\EasySaveWPF\obj\Debug\net9.0-windows\EasySaveWPF.dll
+C:\Users\asust\OneDrive\Desktop\EasySave V1.9\EasySaveWPF\obj\Debug\net9.0-windows\refint\EasySaveWPF.dll
+C:\Users\asust\OneDrive\Desktop\EasySave V1.9\EasySaveWPF\obj\Debug\net9.0-windows\EasySaveWPF.pdb
+C:\Users\asust\OneDrive\Desktop\EasySave V1.9\EasySaveWPF\obj\Debug\net9.0-windows\EasySaveWPF.genruntimeconfig.cache
+C:\Users\asust\OneDrive\Desktop\EasySave V1.9\EasySaveWPF\obj\Debug\net9.0-windows\ref\EasySaveWPF.dll
+C:\Users\dell\Downloads\EasySave-1.9\EasySaveWPF\bin\Debug\net9.0-windows\EasySave.deps.json
+C:\Users\dell\Downloads\EasySave-1.9\EasySaveWPF\bin\Debug\net9.0-windows\EasySave.runtimeconfig.json
+C:\Users\dell\Downloads\EasySave-1.9\EasySaveWPF\bin\Debug\net9.0-windows\EasySave.exe
+C:\Users\dell\Downloads\EasySave-1.9\EasySaveWPF\bin\Debug\net9.0-windows\EasySaveWPF.exe
+C:\Users\dell\Downloads\EasySave-1.9\EasySaveWPF\bin\Debug\net9.0-windows\Languages\en.json
+C:\Users\dell\Downloads\EasySave-1.9\EasySaveWPF\bin\Debug\net9.0-windows\Languages\fr.json
+C:\Users\dell\Downloads\EasySave-1.9\EasySaveWPF\bin\Debug\net9.0-windows\EasySaveWPF.deps.json
+C:\Users\dell\Downloads\EasySave-1.9\EasySaveWPF\bin\Debug\net9.0-windows\EasySaveWPF.runtimeconfig.json
+C:\Users\dell\Downloads\EasySave-1.9\EasySaveWPF\bin\Debug\net9.0-windows\EasySaveWPF.dll
+C:\Users\dell\Downloads\EasySave-1.9\EasySaveWPF\bin\Debug\net9.0-windows\EasySaveWPF.pdb
+C:\Users\dell\Downloads\EasySave-1.9\EasySaveWPF\bin\Debug\net9.0-windows\Microsoft.Extensions.DependencyInjection.dll
+C:\Users\dell\Downloads\EasySave-1.9\EasySaveWPF\bin\Debug\net9.0-windows\Microsoft.Extensions.DependencyInjection.Abstractions.dll
+C:\Users\dell\Downloads\EasySave-1.9\EasySaveWPF\bin\Debug\net9.0-windows\EasySave.dll
+C:\Users\dell\Downloads\EasySave-1.9\EasySaveWPF\bin\Debug\net9.0-windows\EasySave.Logging.dll
+C:\Users\dell\Downloads\EasySave-1.9\EasySaveWPF\bin\Debug\net9.0-windows\EasySave.pdb
+C:\Users\dell\Downloads\EasySave-1.9\EasySaveWPF\bin\Debug\net9.0-windows\EasySave.Logging.pdb
+C:\Users\dell\Downloads\EasySave-1.9\EasySaveWPF\obj\Debug\net9.0-windows\EasySaveWPF.csproj.AssemblyReference.cache
+C:\Users\dell\Downloads\EasySave-1.9\EasySaveWPF\obj\Debug\net9.0-windows\Views\MainWindow.g.cs
+C:\Users\dell\Downloads\EasySave-1.9\EasySaveWPF\obj\Debug\net9.0-windows\App.g.cs
+C:\Users\dell\Downloads\EasySave-1.9\EasySaveWPF\obj\Debug\net9.0-windows\GeneratedInternalTypeHelper.g.cs
+C:\Users\dell\Downloads\EasySave-1.9\EasySaveWPF\obj\Debug\net9.0-windows\EasySaveWPF_MarkupCompile.cache
+C:\Users\dell\Downloads\EasySave-1.9\EasySaveWPF\obj\Debug\net9.0-windows\EasySaveWPF_MarkupCompile.lref
+C:\Users\dell\Downloads\EasySave-1.9\EasySaveWPF\obj\Debug\net9.0-windows\Views\MainWindow.baml
+C:\Users\dell\Downloads\EasySave-1.9\EasySaveWPF\obj\Debug\net9.0-windows\EasySaveWPF.g.resources
+C:\Users\dell\Downloads\EasySave-1.9\EasySaveWPF\obj\Debug\net9.0-windows\EasySaveWPF.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\dell\Downloads\EasySave-1.9\EasySaveWPF\obj\Debug\net9.0-windows\EasySaveWPF.AssemblyInfoInputs.cache
+C:\Users\dell\Downloads\EasySave-1.9\EasySaveWPF\obj\Debug\net9.0-windows\EasySaveWPF.AssemblyInfo.cs
+C:\Users\dell\Downloads\EasySave-1.9\EasySaveWPF\obj\Debug\net9.0-windows\EasySaveWPF.csproj.CoreCompileInputs.cache
+C:\Users\dell\Downloads\EasySave-1.9\EasySaveWPF\obj\Debug\net9.0-windows\EasySave.EAE565E4.Up2Date
+C:\Users\dell\Downloads\EasySave-1.9\EasySaveWPF\obj\Debug\net9.0-windows\EasySaveWPF.dll
+C:\Users\dell\Downloads\EasySave-1.9\EasySaveWPF\obj\Debug\net9.0-windows\refint\EasySaveWPF.dll
+C:\Users\dell\Downloads\EasySave-1.9\EasySaveWPF\obj\Debug\net9.0-windows\EasySaveWPF.pdb
+C:\Users\dell\Downloads\EasySave-1.9\EasySaveWPF\obj\Debug\net9.0-windows\EasySaveWPF.genruntimeconfig.cache
+C:\Users\dell\Downloads\EasySave-1.9\EasySaveWPF\obj\Debug\net9.0-windows\ref\EasySaveWPF.dll
