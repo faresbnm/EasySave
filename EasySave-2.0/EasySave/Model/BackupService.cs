@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Security.Cryptography;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using EasySave.Localization;
@@ -9,7 +10,7 @@ using EasySave.Logging;
 
 namespace EasySave.Model
 {
-    internal class BackupService
+    public class BackupService
     {
         private readonly string _jsonFilePath;
         private readonly JsonSerializerOptions _jsonOptions;
@@ -17,6 +18,9 @@ namespace EasySave.Model
         private ILogger _logger;
         private readonly IStateTracker _stateTracker;
         private readonly ILocalizationService _localization;
+        private PauseTokenSource _pauseTokenSource;
+        private CancellationTokenSource _cancellationTokenSource;
+        private object _lock = new object();
 
 
         public BackupService(ILocalizationService localization)
@@ -83,15 +87,20 @@ namespace EasySave.Model
             var backups = GetAllBackups();
 
             // Check maximum backups limit
-            if (backups.Count >= MaxBackups)
-            {
-                return (false, "MaximumBackupsReached");
-            }
+            //if (backups.Count >= MaxBackups)
+            //{
+            //   return (false, "MaximumBackupsReached");
+            //}
 
             // Check duplicate name
             if (backups.Any(b => b.BackupName.Equals(newBackup.BackupName, StringComparison.OrdinalIgnoreCase)))
             {
                 return (false, "BackupNameExists");
+            }
+
+            if (string.IsNullOrWhiteSpace(newBackup.BackupName))
+            {
+                return (false, "EmptyBackupName");
             }
 
             // Check source path
@@ -104,6 +113,11 @@ namespace EasySave.Model
             if (!Directory.Exists(newBackup.Target))
             {
                 return (false, "TargetPathNotExist");
+            }
+
+            if (newBackup.Source.Equals(newBackup.Target, StringComparison.OrdinalIgnoreCase))
+            {
+                return (false, "SourceAndTargetSame");
             }
 
             // Check backup type
@@ -270,15 +284,46 @@ namespace EasySave.Model
 
             return (null, "InvalidInput");
         }
+        public void PauseBackup()
+        {
+            lock (_lock)
+            {
+                _pauseTokenSource?.Pause();
+            }
+        }
 
+        public void ResumeBackup()
+        {
+            lock (_lock)
+            {
+                _pauseTokenSource?.Resume();
+            }
+        }
+
+        public void StopBackup()
+        {
+            lock (_lock)
+            {
+                _cancellationTokenSource?.Cancel();
+            }
+        }
         public List<string> ExecuteBackups(List<string> backupNames)
         {
+            // Initialize control tokens
+            lock (_lock)
+            {
+                _cancellationTokenSource = new CancellationTokenSource();
+                _pauseTokenSource = new PauseTokenSource();
+            }
             var results = new List<string>();
 
             foreach (var backupName in backupNames)
             {
                 try
                 {
+                    // Check for cancellation
+                    _cancellationTokenSource.Token.ThrowIfCancellationRequested();
+
                     var (backup, message) = GetBackupByName(backupName);
                     if (backup == null)
                     {

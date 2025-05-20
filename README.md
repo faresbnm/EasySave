@@ -8,21 +8,13 @@ The project was created to provide a lightweight and flexible backup solution. I
 
 Full & differential backup support
 
-Real-time status tracking 
+Real-time status tracking (state.json)
 
-Daily logs (C:\ProgramData\EasySave\Logs\YYYY-MM-DD.json)
+Daily logs (YYYY-MM-DD.json)
 
 Multilingual support (FR/EN)
 
 Modular design for future GUI (v2.0)
-
-Note: you can find Log and state files in:
-
-C:\ProgramData\EasySave\ For windows
-
-/Library/Application Support/EasySave/ For macos
-
-/usr/share/EasySave/ For linux
 
 # Prerequisites
 

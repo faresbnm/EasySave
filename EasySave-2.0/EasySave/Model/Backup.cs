@@ -4,7 +4,7 @@ using System.Text.Json.Serialization;
 namespace EasySave.Model
 {
     [Serializable]
-    internal class Backup
+    public class Backup
     {
         [JsonPropertyName("backupName")]
         public string BackupName { get; set; }
@@ -17,6 +17,9 @@ namespace EasySave.Model
 
         [JsonPropertyName("type")]
         public int Type { get; set; }
+
+        [JsonIgnore]
+        public string TypeDisplay { get; set; }
 
         // Add a parameterless constructor for deserialization
         public Backup()

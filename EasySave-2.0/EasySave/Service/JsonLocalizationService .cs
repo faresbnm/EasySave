@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.IO;
 using System.Text.Json;
 using System.Globalization;
-using System.Threading;
 
 namespace EasySave.Localization
 {
@@ -37,14 +36,10 @@ namespace EasySave.Localization
 
             try
             {
-                // Get the path to the Languages folder in your project
-                string languagesPath = Path.Combine(Directory.GetCurrentDirectory(), "Languages");
-                string filePath = Path.Combine(languagesPath, $"{_currentLanguage}.json");
-                if (!File.Exists(filePath))
-                {
-                    // Try alternative path for when running from bin folder
-                    filePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Languages", $"{_currentLanguage}.json");
-                }
+                string filePath = Path.Combine(
+                    AppDomain.CurrentDomain.BaseDirectory,
+                    "Languages",
+                    $"{_currentLanguage}.json");
 
                 if (File.Exists(filePath))
                 {
