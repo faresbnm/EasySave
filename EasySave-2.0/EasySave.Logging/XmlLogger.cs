@@ -22,7 +22,7 @@ namespace EasySave.Logging
             Directory.CreateDirectory(_logDirectory);
         }
 
-        public void LogTransfer(string backupName, string sourcePath, string targetPath, long fileSize, double transferTimeMs)
+        public void LogTransfer(string backupName, string sourcePath, string targetPath, long fileSize, double transferTimeMs, double encryptionTimeMs)
         {
             var logEntry = new LogEntry
             {
@@ -32,7 +32,10 @@ namespace EasySave.Logging
                 TargetPath = targetPath,
                 FileSize = fileSize,
                 TransferTimeMs = transferTimeMs,
-                Status = transferTimeMs >= 0 ? "SUCCESS" : "FAILED"
+                Status = transferTimeMs >= 0 ? "SUCCESS" : "FAILED",
+                EncryptionTimeMs = encryptionTimeMs,
+                EncryptionStatus = encryptionTimeMs > 0 ? "ENCRYPTED" :
+                         encryptionTimeMs < 0 ? "ENCRYPTION_FAILED" : "NOT_ENCRYPTED"
             };
 
             string logFile = Path.Combine(_logDirectory, $"{DateTime.Now:yyyy-MM-dd}.xml");
@@ -105,5 +108,9 @@ namespace EasySave.Logging
         public long FileSize { get; set; }
         public double TransferTimeMs { get; set; }
         public string Status { get; set; }
+        public double EncryptionTimeMs { get; set; }
+        public string EncryptionStatus { get; set; }
+
+
     }
 }

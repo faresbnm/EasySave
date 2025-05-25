@@ -7,6 +7,7 @@ using System.Text.Json;
 using System.Text.Json.Serialization;
 using EasySave.Localization;
 using EasySave.Logging;
+using CryptoSoft;
 
 namespace EasySave.Model
 {
@@ -21,6 +22,8 @@ namespace EasySave.Model
         private PauseTokenSource _pauseTokenSource;
         private CancellationTokenSource _cancellationTokenSource;
         private object _lock = new object();
+        private List<string> _encryptionExtensions = new List<string>();
+        private string _encryptionKey = "123";
 
 
         public BackupService(ILocalizationService localization)
@@ -136,6 +139,16 @@ namespace EasySave.Model
             if (!Directory.Exists(newBackup.Source))
             {
                 return (false, "SourcePathNotExist");
+            }
+
+            if (string.IsNullOrWhiteSpace(newBackup.BackupName))
+            {
+                return (false, "EmptyBackupName");
+            }
+
+            if (newBackup.Source.Equals(newBackup.Target, StringComparison.OrdinalIgnoreCase))
+            {
+                return (false, "SourceAndTargetSame");
             }
 
             // Check target path
@@ -433,6 +446,36 @@ namespace EasySave.Model
             }
         }
 
+        public void SetEncryptionExtensions(List<string> extensions)
+        {
+            _encryptionExtensions = extensions;
+        }
+
+        public void SetEncryptionKey(string key)
+        {
+            if (!string.IsNullOrWhiteSpace(key))
+            {
+                _encryptionKey = key;
+            }
+        }
+
+        private void EncryptFileIfNeeded(string filePath, string backupName)
+        {
+            var extension = Path.GetExtension(filePath);
+            if (!_encryptionExtensions.Contains(extension.ToLower()))
+                return;
+
+            try
+            {
+                var fileManager = new FileManager(filePath, _encryptionKey); // Use field here
+                int encryptionTime = fileManager.TransformFile();
+            }
+            catch (Exception ex)
+            {
+                // Error handling
+            }
+        }
+
         private void CopyDirectory(string sourceDir, string targetDir, string backupName, bool isFullBackup, string lastBackupPath)
         {
             string timestampedFolder = GetTimestampedFolderName(backupName);
@@ -490,6 +533,22 @@ namespace EasySave.Model
 
                         var startTime = DateTime.Now;
                         File.Copy(file, destFile, true);
+
+                        // Encrypt if needed
+                        double encryptionTimeMs = 0;
+                        var extension = Path.GetExtension(file);
+                        if (_encryptionExtensions.Contains(extension.ToLower()))
+                        {
+                            try
+                            {
+                                var fileManager = new FileManager(destFile, _encryptionKey);
+                                encryptionTimeMs = fileManager.TransformFile();
+                            }
+                            catch
+                            {
+                                encryptionTimeMs = -1; // Indicates encryption failure
+                            }
+                        }
                         var endTime = DateTime.Now;
 
                         // Log the file transfer
@@ -499,7 +558,8 @@ namespace EasySave.Model
                             file,
                             destFile,
                             fileInfo.Length,
-                            (endTime - startTime).TotalMilliseconds
+                            (endTime - startTime).TotalMilliseconds,
+                            encryptionTimeMs
                         );
 
                         // Update state after successful copy
@@ -514,6 +574,7 @@ namespace EasySave.Model
                             file,
                             destFile,
                             new FileInfo(file).Length,
+                            -1, // Negative value indicates failure
                             -1 // Negative value indicates failure
                         );
 

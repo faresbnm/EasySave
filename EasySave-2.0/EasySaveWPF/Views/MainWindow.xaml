@@ -1,6 +1,7 @@
 ﻿<Window x:Class="EasySaveWPF.Views.MainWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:helpers="clr-namespace:EasySaveWPF.Helpers"
         xmlns:local="clr-namespace:EasySaveWPF.Converters"
         Title="{Binding WindowTitle}" 
         Height="600" Width="800"
@@ -109,6 +110,27 @@
 
                     <TextBlock Text="{Binding SoftwareText}" Margin="0,5,0,0"/>
                     <TextBox Text="{Binding BusinessSoftwareName}" Margin="0,0,0,15"/>
+
+                    <TextBlock Text="{Binding ExtensionText}" Margin="0,5,0,0"/>
+                    <StackPanel Orientation="Horizontal" Margin="0,5,0,10">
+                        <TextBox Text="{Binding NewExtension, UpdateSourceTrigger=PropertyChanged}" Width="100" Margin="0,0,5,0"/>
+                        <Button Content="{Binding AddExtensionButtonText}" Command="{Binding AddExtensionCommand}" Width="60"/>
+                    </StackPanel>
+
+                    <ListBox ItemsSource="{Binding EncryptionExtensions}" Height="100" Margin="0,0,0,10">
+                        <ListBox.ItemTemplate>
+                            <DataTemplate> 
+                                <StackPanel Orientation="Horizontal">
+                                    <TextBlock Text="{Binding}" Margin="0,0,5,0"/>
+                                    <Button Content="X" Command="{Binding DataContext.RemoveExtensionCommand, RelativeSource={RelativeSource AncestorType=ListBox}}" 
+                                    CommandParameter="{Binding}"/>
+                                </StackPanel>
+                            </DataTemplate>
+                        </ListBox.ItemTemplate>
+                    </ListBox>
+                    <TextBlock Text="{Binding EncryptionKeyText}" Margin="0,5,0,0"/>
+                    <PasswordBox helpers:PasswordBoxHelper.BoundPassword="{Binding EncryptionKey, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
+             Margin="0,0,0,15" Width="200" HorizontalAlignment="Left"/>
 
                     <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
                         <Button Content="{Binding CancelButtonText}" Command="{Binding CloseSettingsDialogCommand}" Margin="0,0,10,0" Width="80"/>
