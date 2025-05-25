@@ -26,7 +26,8 @@ namespace EasySave.Logging
             };
         }
 
-        public void LogTransfer(string backupName, string sourcePath, string targetPath, long fileSize, double transferTimeMs)
+        public void LogTransfer(string backupName, string sourcePath, string targetPath,
+                              long fileSize, double transferTimeMs, double encryptionTimeMs)
         {
             var logEntry = new
             {
@@ -36,7 +37,10 @@ namespace EasySave.Logging
                 TargetPath = targetPath,
                 FileSize = fileSize,
                 TransferTimeMs = transferTimeMs,
-                Status = transferTimeMs >= 0 ? "SUCCESS" : "FAILED"
+                Status = transferTimeMs >= 0 ? "SUCCESS" : "FAILED",
+                EncryptionTimeMs = encryptionTimeMs,
+                EncryptionStatus = encryptionTimeMs > 0 ? "ENCRYPTED" :
+                                  encryptionTimeMs < 0 ? "ENCRYPTION_FAILED" : "NOT_ENCRYPTED"
             };
 
             string logFile = Path.Combine(_logDirectory, $"{DateTime.Now:yyyy-MM-dd}.json");

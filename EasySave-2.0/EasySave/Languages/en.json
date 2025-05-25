@@ -91,5 +91,9 @@
     "LogFormatText": "Log format",
     "SoftwareText": "Business Software",
     "SelectBackupToUpdate": "You have to select a backup to update.",
-    "SourceAndTargetSame": "Source and target paths cannot be the same."
+    "SourceAndTargetSame": "Source and target paths cannot be the same.",
+    "AddExtensionToEncrypt": "Add",
+    "RemoveExtensionToEncrypt": "Remove",
+    "SettingsSavedSuccess": "Setting saved succesfuly",
+    "EncryptionKey": "Encryption Key (default is 123)"
 }

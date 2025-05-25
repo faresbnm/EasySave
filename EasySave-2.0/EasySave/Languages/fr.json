@@ -91,5 +91,9 @@
     "LogFormatText": "Format de journal",
     "SoftwareText": "Logiciel métier",
     "SelectBackupToUpdate": "Vous devez sélectionner une sauvegarde à mettre à jour.",
-    "SourceAndTargetSame": "Le chemin source et cible ne peuvent pas être identiques."
+    "SourceAndTargetSame": "Le chemin source et cible ne peuvent pas être identiques.",
+    "AddExtensionToEncrypt": "Ajouter",
+    "RemoveExtensionToEncrypt": "Remove",
+    "SettingsSavedSuccess": "Paramètres enregistrés avec succès",
+    "EncryptionKey": "Clé de chiffrement (par defaut 123)"
 }

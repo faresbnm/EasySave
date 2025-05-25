@@ -26,11 +26,20 @@ namespace EasySaveWPF.ViewModels
         public bool IsSettingsDialogOpen { get; set; }
         public int SelectedLogFormat { get; set; } = 0; // 0 = JSON, 1 = XML
         public string BusinessSoftwareName { get; set; } = "Calculator";
+        public ObservableCollection<string> EncryptionExtensions { get; set; } = new ObservableCollection<string> { ".txt", ".pdf", ".docx" };
+        public string NewExtension { get; set; }
 
         public string UpdateBackupButtonText => _localization["UpdateBackupButtonText"];
         public string DeleteBackupButtonText => _localization["DeleteBackupButtonText"];
         public string ExecuteBackupButtonText => _localization["ExecuteBackupButtonText"];
         public string SettingsButtonText => _localization["Settings"];
+        public string AddExtensionButtonText => _localization["AddExtensionToEncrypt"];
+        public string RemoveExtensionButtonText => _localization["RemoveExtensionToEncrypt"];
+        public string ExtensionsToEncryptText => _localization["ExtensionsToEncrypt"];
+        public string EncryptionKeyText => _localization["EncryptionKey"];
+
+        private string _encryptionKey = "123"; // Default key
+
 
         public event PropertyChangedEventHandler PropertyChanged;
 
@@ -54,6 +63,8 @@ namespace EasySaveWPF.ViewModels
             OpenSettingsDialogCommand = new RelayCommand(OpenSettingsDialog);
             CloseSettingsDialogCommand = new RelayCommand(CloseSettingsDialog);
             ApplySettingsCommand = new RelayCommand(ApplySettings);
+            AddExtensionCommand = new RelayCommand(AddExtension);
+            RemoveExtensionCommand = new RelayCommand<string>(RemoveExtension);
 
             LoadBackups();
         }
@@ -73,6 +84,15 @@ namespace EasySaveWPF.ViewModels
         public Backup SelectedBackup { get; set; }
         public ObservableCollection<Backup> SelectedBackups { get; set; } = new ObservableCollection<Backup>();
 
+        public string EncryptionKey
+        {
+            get => _encryptionKey;
+            set
+            {
+                _encryptionKey = value;
+                OnPropertyChanged();
+            }
+        }
         public bool IsAddBackupDialogOpen
         {
             get => _isAddBackupDialogOpen;
@@ -116,7 +136,6 @@ namespace EasySaveWPF.ViewModels
         public string SoftwareText => _localization["SoftwareText"];
         public string SelectBackupToUpdate => _localization["SelectBackupToUpdate"];
 
-
         public ICommand ChangeLanguageCommand { get; }
         public ICommand LoadBackupsCommand { get; }
         public ICommand AddBackupCommand { get; }
@@ -134,6 +153,8 @@ namespace EasySaveWPF.ViewModels
         public ICommand ApplySettingsCommand { get; }
         public ICommand BrowseUpdatedSourceCommand => new RelayCommand(BrowseUpdatedSource);
         public ICommand BrowseUpdatedTargetCommand => new RelayCommand(BrowseUpdatedTarget);
+        public ICommand AddExtensionCommand { get; }
+        public ICommand RemoveExtensionCommand { get; }
 
         private void ChangeLanguage(string languageCode)
         {
@@ -160,6 +181,37 @@ namespace EasySaveWPF.ViewModels
             OnPropertyChanged(nameof(LogFormatText));
             OnPropertyChanged(nameof(SoftwareText));
             OnPropertyChanged(nameof(SelectBackupToUpdate));
+            OnPropertyChanged(nameof(AddExtensionButtonText));
+            OnPropertyChanged(nameof(RemoveExtensionButtonText));
+            OnPropertyChanged(nameof(ExtensionsToEncryptText));
+            OnPropertyChanged(nameof(EncryptionKeyText));
+
+        }
+
+        private void AddExtension()
+        {
+            if (!string.IsNullOrWhiteSpace(NewExtension))
+            {
+                if (!NewExtension.StartsWith("."))
+                {
+                    NewExtension = "." + NewExtension;
+                }
+
+                if (!EncryptionExtensions.Contains(NewExtension))
+                {
+                    EncryptionExtensions.Add(NewExtension);
+                    NewExtension = string.Empty;
+                    OnPropertyChanged(nameof(NewExtension));
+                }
+            }
+        }
+
+        private void RemoveExtension(string extension)
+        {
+            if (EncryptionExtensions.Contains(extension))
+            {
+                EncryptionExtensions.Remove(extension);
+            }
         }
 
         private void LoadBackups()
@@ -283,7 +335,7 @@ namespace EasySaveWPF.ViewModels
                 Type = UpdatedBackupType
             };
 
-            var (isValid, message) = _backupService.ValidateBackup(updated);
+            var (isValid, message) = _backupService.ValidateUpdatedBackup(updated);
 
             if (!isValid)
             {
@@ -348,7 +400,7 @@ namespace EasySaveWPF.ViewModels
             var names = selected.Select(b => b.BackupName).ToList();
             var results = _backupService.ExecuteBackups(names);
 
-            if(results != null)
+            if (results != null)
             {
                 System.Windows.MessageBox.Show(_localization["ExecutionResult"], _localization["Success"], MessageBoxButton.OK, MessageBoxImage.Information);
             }
@@ -396,10 +448,12 @@ namespace EasySaveWPF.ViewModels
         {
             var format = SelectedLogFormat == 0 ? LogFormat.Json : LogFormat.Xml;
             _backupService.SetLogFormat(format);
+            _backupService.SetEncryptionExtensions(EncryptionExtensions.ToList());
+            _backupService.SetEncryptionKey(EncryptionKey); 
 
             IsSettingsDialogOpen = false;
             OnPropertyChanged(nameof(IsSettingsDialogOpen));
-            System.Windows.MessageBox.Show("Paramètres enregistrés avec succès.");
+            System.Windows.MessageBox.Show(_localization["SettingsSavedSuccess"], _localization["Success"], MessageBoxButton.OK, MessageBoxImage.Information);
         }
 
         protected virtual void OnPropertyChanged([CallerMemberName] string propertyName = null)
