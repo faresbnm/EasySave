@@ -320,7 +320,7 @@ namespace EasySave.Model
                 _cancellationTokenSource?.Cancel();
             }
         }
-        public List<string> ExecuteBackups(List<string> backupNames)
+        public async Task<List<string>> ExecuteBackups(List<string> backupNames)
         {
             // Initialize control tokens
             lock (_lock)
@@ -328,13 +328,14 @@ namespace EasySave.Model
                 _cancellationTokenSource = new CancellationTokenSource();
                 _pauseTokenSource = new PauseTokenSource();
             }
+
             var results = new List<string>();
 
             foreach (var backupName in backupNames)
             {
                 try
                 {
-                    // Check for cancellation
+                    // Check for cancellation before starting each backup
                     _cancellationTokenSource.Token.ThrowIfCancellationRequested();
 
                     var (backup, message) = GetBackupByName(backupName);
@@ -344,7 +345,7 @@ namespace EasySave.Model
                         continue;
                     }
 
-                    //initialize state
+                    // Initialize state
                     _stateTracker.InitializeState(backup.BackupName);
 
                     if (backup.Type == 1) // Full backup
@@ -354,7 +355,18 @@ namespace EasySave.Model
                         _stateTracker.UpdateState(backup.BackupName, "Preparing",
                             fileCount.Count, fileCount.TotalSize);
 
-                        CopyDirectory(backup.Source, backup.Target, backup.BackupName, true, null);
+                        // Add pause check point with status
+                        if (_pauseTokenSource.IsPaused)
+                        {
+                            results.Add(_localization["BackupPaused"]);
+                            await _pauseTokenSource.WaitWhilePausedAsync();
+                            results.Add(_localization["BackupResumed"]);
+                        }
+
+                        // Wait if paused before starting
+                        await _pauseTokenSource.WaitWhilePausedAsync();
+
+                        await CopyDirectoryAsync(backup.Source, backup.Target, backup.BackupName, true, null);
                         results.Add(_localization.Format("FullBackupSuccess", backup.BackupName));
 
                         _stateTracker.UpdateState(backup.BackupName, "Completed");
@@ -369,7 +381,18 @@ namespace EasySave.Model
                             _stateTracker.UpdateState(backup.BackupName, "Preparing",
                                 fileCount.Count, fileCount.TotalSize);
 
-                            CopyDirectory(backup.Source, backup.Target, backup.BackupName, true, null);
+                            // Add pause check point with status
+                            if (_pauseTokenSource.IsPaused)
+                            {
+                                results.Add(_localization["BackupPaused"]);
+                                await _pauseTokenSource.WaitWhilePausedAsync();
+                                results.Add(_localization["BackupResumed"]);
+                            }
+
+                            // Wait if paused before starting
+                            await _pauseTokenSource.WaitWhilePausedAsync();
+
+                            await CopyDirectoryAsync(backup.Source, backup.Target, backup.BackupName, true, null);
                             results.Add(_localization.Format("DifferentialBackupSuccess", backup.BackupName));
                             _stateTracker.UpdateState(backup.BackupName, "Completed");
                         }
@@ -380,15 +403,32 @@ namespace EasySave.Model
                             _stateTracker.UpdateState(backup.BackupName, "Preparing",
                                 fileCount.Count, fileCount.TotalSize);
 
-                            CopyDirectory(backup.Source, backup.Target, backup.BackupName, false, originalBackupPath);
+                            // Add pause check point with status
+                            if (_pauseTokenSource.IsPaused)
+                            {
+                                results.Add(_localization["BackupPaused"]);
+                                await _pauseTokenSource.WaitWhilePausedAsync();
+                                results.Add(_localization["BackupResumed"]);
+                            }
+
+                            // Wait if paused before starting
+                            await _pauseTokenSource.WaitWhilePausedAsync();
+
+                            await CopyDirectoryAsync(backup.Source, backup.Target, backup.BackupName, false, originalBackupPath);
                             results.Add($"Differential backup '{backup.BackupName}' executed successfully");
                             _stateTracker.UpdateState(backup.BackupName, "Completed");
                         }
                     }
                 }
+                catch (OperationCanceledException)
+                {
+                    results.Add(_localization["BackupResumed"]);
+                    _stateTracker.UpdateState(backupName, "Cancelled");
+                }
                 catch (Exception ex)
                 {
                     results.Add($"Failed to execute backup '{backupName}': {ex.Message}");
+                    _stateTracker.UpdateState(backupName, "Error");
                 }
             }
 
@@ -476,6 +516,146 @@ namespace EasySave.Model
             }
         }
 
+        private async Task CopyDirectoryAsync(string sourceDir, string targetDir, string backupName, bool isFullBackup, string lastBackupPath)
+        {
+            string timestampedFolder = GetTimestampedFolderName(backupName);
+            string backupTargetDir = Path.Combine(targetDir, timestampedFolder);
+
+            // First pass: check if there are any changes
+            bool hasChanges = false;
+            if (!isFullBackup && lastBackupPath != null)
+            {
+                hasChanges = Directory.GetFiles(sourceDir, "*", SearchOption.AllDirectories)
+                    .Any(file => {
+                        string relativePath = file.Substring(sourceDir.Length + 1);
+                        string lastBackupFile = Path.Combine(lastBackupPath, relativePath);
+                        return !File.Exists(lastBackupFile) ||
+                               File.GetLastWriteTime(file) > File.GetLastWriteTime(lastBackupFile);
+                    });
+            }
+            else
+            {
+                hasChanges = true; // Full backup always has "changes"
+            }
+
+            if (!hasChanges)
+            {
+                _stateTracker.UpdateState(backupName, "NoChanges");
+                return; // No changes, skip backup
+            }
+
+            // Second pass: actually copy files
+            Directory.CreateDirectory(backupTargetDir);
+            var files = Directory.GetFiles(sourceDir);
+
+            for (int i = 0; i < files.Length; i++)
+            {
+                // Check for cancellation with status update
+                if (_cancellationTokenSource.IsCancellationRequested)
+                {
+                    _stateTracker.UpdateState(backupName, "Stopping");
+                    _cancellationTokenSource.Token.ThrowIfCancellationRequested();
+                }
+
+                // Check for pause before each file
+                if (_pauseTokenSource.IsPaused)
+                {
+                    _stateTracker.UpdateState(backupName, "Paused");
+                    await _pauseTokenSource.WaitWhilePausedAsync();
+                    _stateTracker.UpdateState(backupName, "Resuming");
+                }
+                string file = files[i];
+                string fileName = Path.GetFileName(file);
+                string destFile = Path.Combine(backupTargetDir, fileName);
+
+                bool shouldCopy = isFullBackup;
+                if (!isFullBackup)
+                {
+                    string lastBackupFile = Path.Combine(lastBackupPath, fileName);
+                    shouldCopy = !File.Exists(lastBackupFile) ||
+                                File.GetLastWriteTime(file) > File.GetLastWriteTime(lastBackupFile);
+                }
+
+                if (shouldCopy)
+                {
+                    try
+                    {
+                        // Update state before copying
+                        _stateTracker.UpdateState(backupName, "InProgress",
+                            currentSource: file, currentTarget: destFile);
+
+                        var startTime = DateTime.Now;
+
+                        // Perform the file copy
+                        File.Copy(file, destFile, true);
+
+                        // Encrypt if needed
+                        double encryptionTimeMs = 0;
+                        var extension = Path.GetExtension(file);
+                        if (_encryptionExtensions.Contains(extension.ToLower()))
+                        {
+                            try
+                            {
+                                var fileManager = new FileManager(destFile, _encryptionKey);
+                                encryptionTimeMs = fileManager.TransformFile();
+                            }
+                            catch
+                            {
+                                encryptionTimeMs = -1; // Indicates encryption failure
+                            }
+                        }
+                        var endTime = DateTime.Now;
+
+                        // Log the file transfer
+                        var fileInfo = new FileInfo(file);
+                        _logger.LogTransfer(
+                            backupName,
+                            file,
+                            destFile,
+                            fileInfo.Length,
+                            (endTime - startTime).TotalMilliseconds,
+                            encryptionTimeMs
+                        );
+
+                        // Update state after successful copy
+                        _stateTracker.UpdateState(backupName, "InProgress",
+                            filesCopied: i + 1, sizeCopied: fileInfo.Length);
+                    }
+                    catch (Exception ex)
+                    {
+                        // Log failed transfer with negative transfer time
+                        _logger.LogTransfer(
+                            backupName,
+                            file,
+                            destFile,
+                            new FileInfo(file).Length,
+                            -1, // Negative value indicates failure
+                            -1  // Negative value indicates failure
+                        );
+
+                        _stateTracker.UpdateState(backupName, "Error",
+                            currentSource: file, currentTarget: destFile);
+                    }
+                }
+            }
+
+            // Handle subdirectories recursively
+            foreach (var subDir in Directory.GetDirectories(sourceDir))
+            {
+                // Check for cancellation before each subdirectory
+                _cancellationTokenSource.Token.ThrowIfCancellationRequested();
+
+                // Check for pause before each subdirectory
+                await _pauseTokenSource.WaitWhilePausedAsync();
+
+                string dirName = Path.GetFileName(subDir);
+                string destSubDir = Path.Combine(backupTargetDir, dirName);
+                string lastBackupSubDir = lastBackupPath != null ? Path.Combine(lastBackupPath, dirName) : null;
+
+                await CopyDirectoryAsync(subDir, destSubDir, backupName, isFullBackup, lastBackupSubDir);
+            }
+        }
+
         private void CopyDirectory(string sourceDir, string targetDir, string backupName, bool isFullBackup, string lastBackupPath)
         {
             string timestampedFolder = GetTimestampedFolderName(backupName);
@@ -504,6 +684,8 @@ namespace EasySave.Model
                 _stateTracker.UpdateState(backupName, "NoChanges");
                 return; // No changes, skip backup
             }
+
+
 
             // Second pass: actually copy files
             Directory.CreateDirectory(backupTargetDir);

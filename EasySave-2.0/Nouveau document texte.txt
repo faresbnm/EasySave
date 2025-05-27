@@ -1,0 +1,5 @@
+deleted succesfully {0}
+message d'erreur extension cryptage cet extension existe deja
+target with no suubdirectory
+gestion log en execution en parallele
+mono instance de cryptage (cryptage fil d'attente)

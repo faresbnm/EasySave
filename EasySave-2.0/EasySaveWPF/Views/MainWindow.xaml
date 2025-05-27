@@ -3,13 +3,62 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:helpers="clr-namespace:EasySaveWPF.Helpers"
         xmlns:local="clr-namespace:EasySaveWPF.Converters"
-        Title="{Binding WindowTitle}" 
+        Title="{Binding WindowTitle}"
         Height="600" Width="800"
-        WindowStartupLocation="CenterScreen">
+        WindowStartupLocation="CenterScreen"
+        Background="Black"
+        FontFamily="Segoe UI" FontSize="14">
 
     <Window.Resources>
         <local:BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter"/>
         <local:BackupTypeConverter x:Key="BackupTypeConverter"/>
+
+        <!-- Styles globaux -->
+        <Style TargetType="TextBlock">
+            <Setter Property="Foreground" Value="Red"/>
+        </Style>
+        <Style TargetType="TextBox">
+            <Setter Property="Foreground" Value="Red"/>
+        </Style>
+        <Style TargetType="ComboBox">
+            <Setter Property="Foreground" Value="Red"/>
+        </Style>
+        <Style TargetType="GroupBox">
+            <Setter Property="Foreground" Value="Red"/>
+        </Style>
+        <Style TargetType="Button">
+            <Setter Property="Background" Value="Black"/>
+            <Setter Property="Foreground" Value="Red"/>
+            <Setter Property="FontWeight" Value="Bold"/>
+            <Setter Property="BorderBrush" Value="Red"/>
+            <Setter Property="BorderThickness" Value="2"/>
+            <Setter Property="Padding" Value="5,2"/>
+            <Setter Property="Margin" Value="5"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border Background="{TemplateBinding Background}"
+                                BorderBrush="{TemplateBinding BorderBrush}"
+                                BorderThickness="{TemplateBinding BorderThickness}"
+                                CornerRadius="5"
+                                SnapsToDevicePixels="True">
+                            <ContentPresenter HorizontalAlignment="Center"
+                                              VerticalAlignment="Center"/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter Property="Background" Value="Red"/>
+                                <Setter Property="Foreground" Value="Black"/>
+                            </Trigger>
+                            <Trigger Property="IsPressed" Value="True">
+                                <Setter Property="Background" Value="#660000"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
     </Window.Resources>
 
     <Grid Margin="10">
@@ -21,42 +70,72 @@
 
         <!-- Action Buttons -->
         <StackPanel Grid.Row="1" Margin="5">
-            <StackPanel HorizontalAlignment="Center" Orientation="Horizontal" >
-            <Button Content="{Binding AddBackupButtonText}" Command="{Binding OpenAddBackupDialogCommand}" Width="120" Margin="0,0,10,0"/>
-            <Button Content="{Binding UpdateBackupButtonText}" Command="{Binding OpenUpdateBackupDialogCommand}" Width="120" Margin="0,0,10,0"/>
-            <Button Content="{Binding DeleteBackupButtonText}" Command="{Binding DeleteBackupCommand}" Width="120"/>
-            <Button Content="{Binding ExecuteBackupButtonText}" Command="{Binding ExecuteBackupCommand}" Width="120" Margin="10,0,0,0"/>
-            <Button Content="{Binding SettingsButtonText}" Command="{Binding OpenSettingsDialogCommand}" Width="120" Margin="10,0,0,0"/>
-            </StackPanel>
-
-            <StackPanel HorizontalAlignment="Center" Orientation="Horizontal" Margin="0,10,0,0">
-                <Button Command="{Binding PauseBackupCommand}" Width="80" Margin="0,0,10,0"
-                IsEnabled="{Binding CanPauseBackup}" ToolTip="{Binding PauseButtonText}">
+            <StackPanel HorizontalAlignment="Center" Orientation="Horizontal">
+                <Button Command="{Binding OpenAddBackupDialogCommand}" Width="120" Margin="0,0,10,0">
                     <StackPanel Orientation="Horizontal">
-                        <Path Data="M0,0 H6 V14 H0 Z M9,0 H15 V14 H9 Z" 
-                      Fill="Black" Stretch="Uniform" Width="16" Height="16"/>
-                        <TextBlock Text="{Binding PauseButtonText}" Margin="5,0,0,0"/>
+                        <TextBlock Text="➕" FontSize="16" Margin="0,0,5,0"/>
+                        <TextBlock Text="{Binding AddBackupButtonText}"/>
                     </StackPanel>
                 </Button>
 
-                <Button Command="{Binding ResumeBackupCommand}" Width="80" Margin="0,0,10,0"
-                IsEnabled="{Binding CanResumeBackup}" ToolTip="{Binding ResumeButtonText}">
+                <Button Command="{Binding OpenUpdateBackupDialogCommand}" Width="120" Margin="0,0,10,0">
                     <StackPanel Orientation="Horizontal">
-                        <Path Data="M0,0 L14,7 L0,14 Z" 
-                      Fill="Green" Stretch="Uniform" Width="16" Height="16"/>
-                        <TextBlock Text="{Binding ResumeButtonText}" Margin="5,0,0,0"/>
+                        <TextBlock Text="✏️" FontSize="16" Margin="0,0,5,0"/>
+                        <TextBlock Text="{Binding UpdateBackupButtonText}"/>
                     </StackPanel>
                 </Button>
 
-                <Button Command="{Binding StopBackupCommand}" Width="80"
-                IsEnabled="{Binding CanStopBackup}" ToolTip="{Binding StopButtonText}">
+                <Button Command="{Binding DeleteBackupCommand}" Width="120" Margin="0,0,10,0">
                     <StackPanel Orientation="Horizontal">
-                        <Rectangle Width="14" Height="14" Fill="Red"/>
-                        <TextBlock Text="{Binding StopButtonText}" Margin="5,0,0,0"/>
+                        <TextBlock Text="🗑️" FontSize="16" Margin="0,0,5,0"/>
+                        <TextBlock Text="{Binding DeleteBackupButtonText}"/>
+                    </StackPanel>
+                </Button>
+
+                <Button Command="{Binding ExecuteBackupCommand}" Width="120" Margin="0,0,10,0">
+                    <StackPanel Orientation="Horizontal">
+                        <TextBlock Text="🚀" FontSize="16" Margin="0,0,5,0"/>
+                        <TextBlock Text="{Binding ExecuteBackupButtonText}"/>
+                    </StackPanel>
+                </Button>
+
+                <Button Command="{Binding OpenSettingsDialogCommand}" Width="120" Margin="10,0,0,0">
+                    <StackPanel Orientation="Horizontal">
+                        <TextBlock Text="⚙️" FontSize="16" Margin="0,0,5,0"/>
+                        <TextBlock Text="{Binding SettingsButtonText}"/>
                     </StackPanel>
                 </Button>
             </StackPanel>
         </StackPanel>
+
+        <StackPanel HorizontalAlignment="Center" Orientation="Horizontal" Margin="0,10,0,0">
+            <Button Command="{Binding PauseBackupCommand}" Width="80" Margin="0,0,10,0"
+                IsEnabled="{Binding CanPauseBackup}" ToolTip="{Binding PauseButtonText}">
+                <StackPanel Orientation="Horizontal">
+                    <Path Data="M0,0 H6 V14 H0 Z M9,0 H15 V14 H9 Z" 
+                      Fill="WHITE" Stretch="Uniform" Width="16" Height="16"/>
+                    <TextBlock Text="{Binding PauseButtonText}" Margin="5,0,0,0"/>
+                </StackPanel>
+            </Button>
+
+            <Button Command="{Binding ResumeBackupCommand}" Width="80" Margin="0,0,10,0"
+                IsEnabled="{Binding CanResumeBackup}" ToolTip="{Binding ResumeButtonText}">
+                <StackPanel Orientation="Horizontal">
+                    <Path Data="M0,0 L14,7 L0,14 Z" 
+                      Fill="Green" Stretch="Uniform" Width="16" Height="16"/>
+                    <TextBlock Text="{Binding ResumeButtonText}" Margin="5,0,0,0"/>
+                </StackPanel>
+            </Button>
+
+            <Button Command="{Binding StopBackupCommand}" Width="80" Margin="0,0,10,0"
+                IsEnabled="{Binding CanStopBackup}" ToolTip="{Binding StopButtonText}">
+                <StackPanel Orientation="Horizontal">
+                    <Rectangle Width="14" Height="14" Fill="Red"/>
+                    <TextBlock Text="{Binding StopButtonText}" Margin="5,0,0,0"/>
+                </StackPanel>
+            </Button>
+        </StackPanel>
+
 
         <!-- Backup List -->
         <GroupBox Header="{Binding BackupListHeader}" Grid.Row="2">
@@ -88,55 +167,57 @@
         <!-- Page de paramètres -->
         <Grid Visibility="{Binding IsSettingsDialogOpen, Converter={StaticResource BooleanToVisibilityConverter}}"
       Panel.ZIndex="5" Grid.RowSpan="3" Background="#80000000">
-            <Border Background="White" Width="400" Padding="20" HorizontalAlignment="Center" VerticalAlignment="Center">
-                <StackPanel>
-                    <TextBlock Text="{Binding SettingsButtonText}" FontWeight="Bold" FontSize="16" Margin="0,0,0,10"/>
-                    
-                    <!-- Language Selection -->
-                    <TextBlock Text="{Binding SetLanguage}" Margin="0,0,0,10"/>
-                    <StackPanel Orientation="Horizontal" Grid.Row="0">
-                        <Button Content="English" Command="{Binding ChangeLanguageCommand}" CommandParameter="en" Margin="5"/>
-                        <Button Content="Français" Command="{Binding ChangeLanguageCommand}" CommandParameter="fr" Margin="5"/>
-                    </StackPanel>
+            <Border Background="Black" Width="400" Padding="20" HorizontalAlignment="Center" VerticalAlignment="Center">
+                <ScrollViewer VerticalScrollBarVisibility="Auto">
+                    <StackPanel>
+                        <TextBlock Text="{Binding SettingsButtonText}" FontWeight="Bold" FontSize="16" Margin="0,0,0,10"/>
 
-                    <TextBlock Text="{Binding LogFormatText}" Margin="0,5,0,0"/>
-                    <ComboBox SelectedIndex="{Binding SelectedLogFormat}" Margin="0,0,0,10">
-                        <ComboBoxItem Content="JSON"/>
-                        <ComboBoxItem Content="XML"/>
-                    </ComboBox>
+                        <!-- Language Selection -->
+                        <TextBlock Text="{Binding SetLanguage}" Margin="0,0,0,10"/>
+                        <StackPanel Orientation="Horizontal" Grid.Row="0">
+                            <Button Content="English" Command="{Binding ChangeLanguageCommand}" CommandParameter="en" Margin="5"/>
+                            <Button Content="Français" Command="{Binding ChangeLanguageCommand}" CommandParameter="fr" Margin="5"/>
+                        </StackPanel>
 
-                    <TextBlock Text="{Binding ExtensionText}" Margin="0,5,0,0"/>
-                    <TextBox Text="{Binding EncryptionExtensions}" Margin="0,0,0,10"/>
+                        <TextBlock Text="{Binding LogFormatText}" Margin="0,5,0,0"/>
+                        <ComboBox SelectedIndex="{Binding SelectedLogFormat}" Margin="0,0,0,10">
+                            <ComboBoxItem Content="JSON"/>
+                            <ComboBoxItem Content="XML"/>
+                        </ComboBox>
 
-                    <TextBlock Text="{Binding SoftwareText}" Margin="0,5,0,0"/>
-                    <TextBox Text="{Binding BusinessSoftwareName}" Margin="0,0,0,15"/>
+                        <TextBlock Text="{Binding ExtensionText}" Margin="0,5,0,0"/>
+                        <TextBox Text="{Binding EncryptionExtensions}" Margin="0,0,0,10"/>
 
-                    <TextBlock Text="{Binding ExtensionText}" Margin="0,5,0,0"/>
-                    <StackPanel Orientation="Horizontal" Margin="0,5,0,10">
-                        <TextBox Text="{Binding NewExtension, UpdateSourceTrigger=PropertyChanged}" Width="100" Margin="0,0,5,0"/>
-                        <Button Content="{Binding AddExtensionButtonText}" Command="{Binding AddExtensionCommand}" Width="60"/>
-                    </StackPanel>
+                        <TextBlock Text="{Binding SoftwareText}" Margin="0,5,0,0"/>
+                        <TextBox Text="{Binding BusinessSoftwareName}" Margin="0,0,0,15"/>
 
-                    <ListBox ItemsSource="{Binding EncryptionExtensions}" Height="100" Margin="0,0,0,10">
-                        <ListBox.ItemTemplate>
-                            <DataTemplate> 
-                                <StackPanel Orientation="Horizontal">
-                                    <TextBlock Text="{Binding}" Margin="0,0,5,0"/>
-                                    <Button Content="X" Command="{Binding DataContext.RemoveExtensionCommand, RelativeSource={RelativeSource AncestorType=ListBox}}" 
+                        <TextBlock Text="{Binding ExtensionText}" Margin="0,5,0,0"/>
+                        <StackPanel Orientation="Horizontal" Margin="0,5,0,10">
+                            <TextBox Text="{Binding NewExtension, UpdateSourceTrigger=PropertyChanged}" Width="100" Margin="0,0,5,0"/>
+                            <Button Content="{Binding AddExtensionButtonText}" Command="{Binding AddExtensionCommand}" Width="60"/>
+                        </StackPanel>
+
+                        <ListBox ItemsSource="{Binding EncryptionExtensions}" Height="100" Margin="0,0,0,10">
+                            <ListBox.ItemTemplate>
+                                <DataTemplate>
+                                    <StackPanel Orientation="Horizontal">
+                                        <TextBlock Text="{Binding}" Margin="0,0,5,0"/>
+                                        <Button Content="X" Command="{Binding DataContext.RemoveExtensionCommand, RelativeSource={RelativeSource AncestorType=ListBox}}" 
                                     CommandParameter="{Binding}"/>
-                                </StackPanel>
-                            </DataTemplate>
-                        </ListBox.ItemTemplate>
-                    </ListBox>
-                    <TextBlock Text="{Binding EncryptionKeyText}" Margin="0,5,0,0"/>
-                    <PasswordBox helpers:PasswordBoxHelper.BoundPassword="{Binding EncryptionKey, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
+                                    </StackPanel>
+                                </DataTemplate>
+                            </ListBox.ItemTemplate>
+                        </ListBox>
+                        <TextBlock Text="{Binding EncryptionKeyText}" Margin="0,5,0,0"/>
+                        <PasswordBox helpers:PasswordBoxHelper.BoundPassword="{Binding EncryptionKey, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
              Margin="0,0,0,15" Width="200" HorizontalAlignment="Left"/>
 
-                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
-                        <Button Content="{Binding CancelButtonText}" Command="{Binding CloseSettingsDialogCommand}" Margin="0,0,10,0" Width="80"/>
-                        <Button Content="{Binding SaveButtonText}" Command="{Binding ApplySettingsCommand}" Width="80"/>
+                        <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
+                            <Button Content="{Binding CancelButtonText}" Command="{Binding CloseSettingsDialogCommand}" Margin="0,0,10,0" Width="80"/>
+                            <Button Content="{Binding SaveButtonText}" Command="{Binding ApplySettingsCommand}" Margin="0,0,10,0" Width="80"/>
+                        </StackPanel>
                     </StackPanel>
-                </StackPanel>
+                </ScrollViewer>
             </Border>
         </Grid>
 
@@ -144,7 +225,7 @@
         <Grid Visibility="{Binding IsAddBackupDialogOpen, Converter={StaticResource BooleanToVisibilityConverter}}"
               Panel.ZIndex="1" Grid.RowSpan="3"
               Background="#80000000">
-            <Border Background="White" Width="400" Padding="20" HorizontalAlignment="Center" VerticalAlignment="Center">
+            <Border Background="Black" Width="400" Padding="20" HorizontalAlignment="Center" VerticalAlignment="Center">
                 <StackPanel>
                     <TextBlock Text="{Binding AddBackupButtonText}" FontWeight="Bold" FontSize="16" Margin="0,0,0,10"/>
 
@@ -185,7 +266,7 @@
                                 Margin="0,0,10,0" Width="80"/>
                         <Button Content="{Binding SaveButtonText}" 
                                 Command="{Binding AddBackupCommand}" 
-                                Width="80"/>
+                                Margin="0,0,10,0" Width="80"/>
                     </StackPanel>
                 </StackPanel>
             </Border>
@@ -195,7 +276,7 @@
         <Grid Visibility="{Binding IsUpdateBackupDialogOpen, Converter={StaticResource BooleanToVisibilityConverter}}"
               Panel.ZIndex="1" Grid.RowSpan="3"
               Background="#80000000">
-            <Border Background="White" Width="400" Padding="20" HorizontalAlignment="Center" VerticalAlignment="Center">
+            <Border Background="Black" Width="400" Padding="20" HorizontalAlignment="Center" VerticalAlignment="Center">
                 <StackPanel>
                     <TextBlock Text="{Binding UpdateBackupButtonText}" FontWeight="Bold" FontSize="16" Margin="0,0,0,10"/>
 
@@ -234,7 +315,7 @@
                                 Margin="0,0,10,0" Width="80"/>
                         <Button Content="{Binding SaveButtonText}" 
                                 Command="{Binding UpdateBackupCommand}" 
-                                Width="80"/>
+                                Margin="0,0,10,0" Width="80"/>
                     </StackPanel>
                 </StackPanel>
             </Border>

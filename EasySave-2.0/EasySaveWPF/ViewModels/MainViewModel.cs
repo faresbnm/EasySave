@@ -22,6 +22,11 @@ namespace EasySaveWPF.ViewModels
         private bool _isBackupPaused;
         private CancellationTokenSource _cancellationTokenSource;
         private PauseTokenSource _pauseTokenSource;
+        private bool _canPauseBackup;
+        private bool _canResumeBackup;
+        private bool _canStopBackup;
+        private bool _wasBackupStopped;
+
 
         public bool IsSettingsDialogOpen { get; set; }
         public int SelectedLogFormat { get; set; } = 0; // 0 = JSON, 1 = XML
@@ -65,6 +70,13 @@ namespace EasySaveWPF.ViewModels
             ApplySettingsCommand = new RelayCommand(ApplySettings);
             AddExtensionCommand = new RelayCommand(AddExtension);
             RemoveExtensionCommand = new RelayCommand<string>(RemoveExtension);
+            PauseBackupCommand = new RelayCommand(PauseBackup, () => CanPauseBackup);
+            ResumeBackupCommand = new RelayCommand(ResumeBackup, () => CanResumeBackup);
+            StopBackupCommand = new RelayCommand(StopBackup, () => CanStopBackup);
+            CanPauseBackup = false;
+            CanResumeBackup = false;
+            CanStopBackup = false;
+
 
             LoadBackups();
         }
@@ -104,6 +116,26 @@ namespace EasySaveWPF.ViewModels
             get => _isUpdateBackupDialogOpen;
             set { _isUpdateBackupDialogOpen = value; OnPropertyChanged(); }
         }
+
+        public bool CanPauseBackup
+        {
+            get => _canPauseBackup;
+            set { _canPauseBackup = value; OnPropertyChanged(); }
+        }
+
+        public bool CanResumeBackup
+        {
+            get => _canResumeBackup;
+            set { _canResumeBackup = value; OnPropertyChanged(); }
+        }
+
+        public bool CanStopBackup
+        {
+            get => _canStopBackup;
+            set { _canStopBackup = value; OnPropertyChanged(); }
+        }
+
+
 
         public string NewBackupName { get; set; }
         public string NewBackupSource { get; set; }
@@ -155,6 +187,9 @@ namespace EasySaveWPF.ViewModels
         public ICommand BrowseUpdatedTargetCommand => new RelayCommand(BrowseUpdatedTarget);
         public ICommand AddExtensionCommand { get; }
         public ICommand RemoveExtensionCommand { get; }
+        public ICommand PauseBackupCommand { get; }
+        public ICommand ResumeBackupCommand { get; }
+        public ICommand StopBackupCommand { get; }
 
         private void ChangeLanguage(string languageCode)
         {
@@ -203,6 +238,65 @@ namespace EasySaveWPF.ViewModels
                     NewExtension = string.Empty;
                     OnPropertyChanged(nameof(NewExtension));
                 }
+                else
+                {
+                    System.Windows.MessageBox.Show(_localization["ExtensionAlreadyExists"], _localization["Error"], MessageBoxButton.OK, MessageBoxImage.Warning);
+                }
+            }
+        }
+
+        private void PauseBackup()
+        {
+            try
+            {
+                _backupService.PauseBackup();
+                CanPauseBackup = false;
+                CanResumeBackup = true;
+                CanStopBackup = true;
+                _isBackupPaused = true;
+
+                System.Windows.MessageBox.Show(_localization["BackupPaused"], _localization["Status"]);
+            }
+            catch (Exception ex)
+            {
+                System.Windows.MessageBox.Show(_localization["PauseFailed"], _localization["Error"], MessageBoxButton.OK, MessageBoxImage.Error);
+            }
+        }
+
+        private void ResumeBackup()
+        {
+            try
+            {
+                _backupService.ResumeBackup();
+                CanPauseBackup = true;
+                CanResumeBackup = false;
+                CanStopBackup = true;
+                _isBackupPaused = false;
+                System.Windows.MessageBox.Show(_localization["BackupResumed"], _localization["Status"]);
+            }
+            catch (Exception ex)
+            {
+                System.Windows.MessageBox.Show(_localization["ResumeFailed"], _localization["Error"], MessageBoxButton.OK, MessageBoxImage.Error);
+            }
+        }
+
+        private void StopBackup()
+        {
+            try
+            {
+                _backupService.StopBackup();
+                CanPauseBackup = false;
+                CanResumeBackup = false;
+                CanStopBackup = false;
+                _isBackupRunning = false;
+                _isBackupPaused = false;
+                _wasBackupStopped = true;
+                System.Windows.MessageBox.Show(_localization["BackupStopped"], _localization["Status"]);
+
+            }
+            catch (Exception ex)
+            {
+                System.Windows.MessageBox.Show(_localization["StopFailed"], _localization["Error"], MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
 
@@ -387,25 +481,51 @@ namespace EasySaveWPF.ViewModels
             }
         }
 
-        private void ExecuteBackup()
+        private async void ExecuteBackup()
         {
             var selected = SelectedBackups?.ToList() ?? new List<Backup>();
-
             if (selected.Count == 0)
             {
                 System.Windows.MessageBox.Show(_localization["SelectBackupToExecute"], _localization["Error"], MessageBoxButton.OK, MessageBoxImage.Warning);
                 return;
             }
 
-            var names = selected.Select(b => b.BackupName).ToList();
-            var results = _backupService.ExecuteBackups(names);
+            // Update UI state
+            CanPauseBackup = true;
+            CanStopBackup = true;
+            CanResumeBackup = false;
+            _isBackupRunning = true;
+            _wasBackupStopped = false;
 
-            if (results != null)
+            try
             {
-                System.Windows.MessageBox.Show(_localization["ExecutionResult"], _localization["Success"], MessageBoxButton.OK, MessageBoxImage.Information);
-            }
+                var names = selected.Select(b => b.BackupName).ToList();
 
-            LoadBackups();
+                // Run the backup on a background thread
+                var results = await Task.Run(() => _backupService.ExecuteBackups(names));
+
+                // Only show success message if backup wasn't stopped
+                if (results != null && !_wasBackupStopped)
+                {
+                    System.Windows.MessageBox.Show(_localization["ExecutionResult"], _localization["Success"], MessageBoxButton.OK, MessageBoxImage.Information);
+                }
+            }
+            catch (OperationCanceledException)
+            {
+                // Don't show message here - StopBackup will handle it
+            }
+            catch (Exception ex)
+            {
+                System.Windows.MessageBox.Show(_localization["ExecutionFailed"] + ": " + ex.Message, _localization["Error"], MessageBoxButton.OK, MessageBoxImage.Error);
+            }
+            finally
+            {
+                // Reset UI state
+                CanPauseBackup = false;
+                CanStopBackup = false;
+                CanResumeBackup = false;
+                _isBackupRunning = false;
+            }
         }
 
         private void BrowseUpdatedSource()

@@ -95,5 +95,10 @@
     "AddExtensionToEncrypt": "Add",
     "RemoveExtensionToEncrypt": "Remove",
     "SettingsSavedSuccess": "Setting saved succesfuly",
-    "EncryptionKey": "Encryption Key (default is 123)"
+    "EncryptionKey": "Encryption Key (default is 123)",
+    "BackupStopped": "Backup stopped",
+    "BackupPaused": "Backup paused",
+    "BackupResumed": "Backup resumed",
+    "ExtensionAlreadyExists": "Extension already exists",
+    "SelectBackupToDelete": "You have to select a backup to delete."
 }
