@@ -47,15 +47,26 @@ namespace EasySave.Logging
 
             try
             {
-                string jsonContent = File.Exists(logFile)
-                    ? $"{File.ReadAllText(logFile).TrimEnd(']', '\r', '\n')},\n{JsonSerializer.Serialize(logEntry, _jsonOptions)}]"
-                    : $"[{JsonSerializer.Serialize(logEntry, _jsonOptions)}]";
+                // Use file locking to prevent concurrent access
+                lock (typeof(FileLogger)) // Global lock for all FileLogger instances
+                {
+                    string jsonContent;
+                    if (File.Exists(logFile))
+                    {
+                        var existingContent = File.ReadAllText(logFile).TrimEnd(']', '\r', '\n');
+                        jsonContent = $"{existingContent},\n{JsonSerializer.Serialize(logEntry, _jsonOptions)}]";
+                    }
+                    else
+                    {
+                        jsonContent = $"[{JsonSerializer.Serialize(logEntry, _jsonOptions)}]";
+                    }
 
-                File.WriteAllText(logFile, jsonContent);
+                    File.WriteAllText(logFile, jsonContent);
+                }
             }
             catch (Exception ex)
             {
-                // Fail silently or add error handling as needed
+                // Consider logging this error somewhere
             }
         }
     }

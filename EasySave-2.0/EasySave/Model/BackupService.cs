@@ -8,6 +8,7 @@ using System.Text.Json.Serialization;
 using EasySave.Localization;
 using EasySave.Logging;
 using CryptoSoft;
+using System.Collections.Concurrent;
 
 namespace EasySave.Model
 {
@@ -24,12 +25,6 @@ namespace EasySave.Model
         private object _lock = new object();
         private List<string> _encryptionExtensions = new List<string>();
         private string _encryptionKey = "123";
-        public event EventHandler<BackupStateEventArgs> StateChanged;
-
-        protected virtual void OnStateChanged(BackupStateEventArgs e)
-        {
-            StateChanged?.Invoke(this, e);
-        }
 
 
         public BackupService(ILocalizationService localization)
@@ -326,6 +321,108 @@ namespace EasySave.Model
                 _cancellationTokenSource?.Cancel();
             }
         }
+        public async Task<List<string>> ExecuteBackupsInParallel(List<string> backupNames)
+        {
+            // Initialiser les tokens
+            lock (_lock)
+            {
+                _cancellationTokenSource = new CancellationTokenSource();
+                _pauseTokenSource = new PauseTokenSource();
+            }
+
+            var results = new ConcurrentBag<string>();
+
+            var tasks = backupNames.Select(async backupName =>
+            {
+                try
+                {
+                    _cancellationTokenSource.Token.ThrowIfCancellationRequested();
+
+                    var (backup, message) = GetBackupByName(backupName);
+                    if (backup == null)
+                    {
+                        results.Add(_localization.Format("BackupNotFound", backupName));
+                        return;
+                    }
+
+                    _stateTracker.InitializeState(backup.BackupName);
+
+                    if (backup.Type == 1) // Full backup
+                    {
+                        var fileCount = CountFiles(backup.Source);
+                        _stateTracker.UpdateState(backup.BackupName, "Preparing", fileCount.Count, fileCount.TotalSize);
+
+                        // Pause si nécessaire
+                        if (_pauseTokenSource.IsPaused)
+                        {
+                            results.Add(_localization["BackupPaused"]);
+                            await _pauseTokenSource.WaitWhilePausedAsync();
+                            results.Add(_localization["BackupResumed"]);
+                        }
+
+                        await _pauseTokenSource.WaitWhilePausedAsync();
+
+                        await CopyDirectoryAsync(backup.Source, backup.Target, backup.BackupName, true, null);
+                        results.Add(_localization.Format("FullBackupSuccess", backup.BackupName));
+
+                        _stateTracker.UpdateState(backup.BackupName, "Completed");
+                    }
+                    else // Differential backup
+                    {
+                        string originalBackupPath = FindOriginalFullBackup(backup.Target, backup.BackupName);
+                        if (originalBackupPath == null)
+                        {
+                            var fileCount = CountFiles(backup.Source);
+                            _stateTracker.UpdateState(backup.BackupName, "Preparing", fileCount.Count, fileCount.TotalSize);
+
+                            if (_pauseTokenSource.IsPaused)
+                            {
+                                results.Add(_localization["BackupPaused"]);
+                                await _pauseTokenSource.WaitWhilePausedAsync();
+                                results.Add(_localization["BackupResumed"]);
+                            }
+
+                            await _pauseTokenSource.WaitWhilePausedAsync();
+
+                            await CopyDirectoryAsync(backup.Source, backup.Target, backup.BackupName, true, null);
+                            results.Add(_localization.Format("DifferentialBackupSuccess", backup.BackupName));
+                            _stateTracker.UpdateState(backup.BackupName, "Completed");
+                        }
+                        else
+                        {
+                            var fileCount = CountChangedFiles(backup.Source, originalBackupPath);
+                            _stateTracker.UpdateState(backup.BackupName, "Preparing", fileCount.Count, fileCount.TotalSize);
+
+                            if (_pauseTokenSource.IsPaused)
+                            {
+                                results.Add(_localization["BackupPaused"]);
+                                await _pauseTokenSource.WaitWhilePausedAsync();
+                                results.Add(_localization["BackupResumed"]);
+                            }
+
+                            await _pauseTokenSource.WaitWhilePausedAsync();
+
+                            await CopyDirectoryAsync(backup.Source, backup.Target, backup.BackupName, false, originalBackupPath);
+                            results.Add(_localization.Format("DifferentialBackupSuccess", backup.BackupName));
+                            _stateTracker.UpdateState(backup.BackupName, "Completed");
+                        }
+                    }
+                }
+                catch (OperationCanceledException)
+                {
+                    //results.Add($"Backup {backupName} cancelled.");
+                }
+                catch (Exception ex)
+                {
+                    results.Add($"Backup {backupName} failed: {ex.Message}");
+                }
+            });
+
+            await Task.WhenAll(tasks); // Attend que tous les backups se terminent
+
+            return results.ToList();
+        }
+
         public async Task<List<string>> ExecuteBackups(List<string> backupNames)
         {
             // Initialize control tokens
@@ -524,16 +621,10 @@ namespace EasySave.Model
 
         private async Task CopyDirectoryAsync(string sourceDir, string targetDir, string backupName, bool isFullBackup, string lastBackupPath)
         {
-
-            var fileCount = isFullBackup
-            ? CountFiles(sourceDir)
-            : CountChangedFiles(sourceDir, lastBackupPath ?? sourceDir);
-
-            long cumulativeSizeCopied = 0;
             string timestampedFolder = GetTimestampedFolderName(backupName);
             string backupTargetDir = Path.Combine(targetDir, timestampedFolder);
 
-            // First pass: check if there are any changes
+            // Première passe : vérifie s’il y a des changements
             bool hasChanges = false;
             if (!isFullBackup && lastBackupPath != null)
             {
@@ -547,44 +638,34 @@ namespace EasySave.Model
             }
             else
             {
-                hasChanges = true; // Full backup always has "changes"
+                hasChanges = true; // Full backup always has changes
             }
 
             if (!hasChanges)
             {
                 _stateTracker.UpdateState(backupName, "NoChanges");
-                OnStateChanged(new BackupStateEventArgs
-                {
-                    BackupName = backupName,
-                    State = "NoChanges",
-                    FilesCopied = 0,
-                    TotalFiles = fileCount.Count,
-                    SizeCopied = 0,
-                    TotalSize = fileCount.TotalSize
-                });
-                return; // No changes, skip backup
+                return;
             }
 
-            // Second pass: actually copy files
+            // Crée le dossier
             Directory.CreateDirectory(backupTargetDir);
             var files = Directory.GetFiles(sourceDir);
 
             for (int i = 0; i < files.Length; i++)
             {
-                // Check for cancellation with status update
                 if (_cancellationTokenSource.IsCancellationRequested)
                 {
                     _stateTracker.UpdateState(backupName, "Stopping");
                     _cancellationTokenSource.Token.ThrowIfCancellationRequested();
                 }
 
-                // Check for pause before each file
                 if (_pauseTokenSource.IsPaused)
                 {
                     _stateTracker.UpdateState(backupName, "Paused");
                     await _pauseTokenSource.WaitWhilePausedAsync();
                     _stateTracker.UpdateState(backupName, "Resuming");
                 }
+
                 string file = files[i];
                 string fileName = Path.GetFileName(file);
                 string destFile = Path.Combine(backupTargetDir, fileName);
@@ -594,36 +675,26 @@ namespace EasySave.Model
                 {
                     string lastBackupFile = Path.Combine(lastBackupPath, fileName);
                     shouldCopy = !File.Exists(lastBackupFile) ||
-                                File.GetLastWriteTime(file) > File.GetLastWriteTime(lastBackupFile);
+                                 File.GetLastWriteTime(file) > File.GetLastWriteTime(lastBackupFile);
                 }
 
                 if (shouldCopy)
                 {
                     try
                     {
-                        var fileInfo = new FileInfo(file);
-                        long fileSize = fileInfo.Length;
-                        // Update state before copying
                         _stateTracker.UpdateState(backupName, "InProgress",
                             currentSource: file, currentTarget: destFile);
 
-                        cumulativeSizeCopied += fileSize;
-                        OnStateChanged(new BackupStateEventArgs
-                        {
-                            BackupName = backupName,
-                            State = "InProgress",
-                            FilesCopied = i + 1,
-                            TotalFiles = fileCount.Count,
-                            SizeCopied = cumulativeSizeCopied,
-                            TotalSize = fileCount.TotalSize
-                        });
-
                         var startTime = DateTime.Now;
 
-                        // Perform the file copy
-                        File.Copy(file, destFile, true);
+                        // 🟢 ✅ Ici, la **copie asynchrone**
+                        using (var sourceStream = new FileStream(file, FileMode.Open, FileAccess.Read, FileShare.Read, 4096, useAsync: true))
+                        using (var destinationStream = new FileStream(destFile, FileMode.Create, FileAccess.Write, FileShare.None, 4096, useAsync: true))
+                        {
+                            await sourceStream.CopyToAsync(destinationStream);
+                        }
 
-                        // Encrypt if needed
+                        // Encryption si besoin
                         double encryptionTimeMs = 0;
                         var extension = Path.GetExtension(file);
                         if (_encryptionExtensions.Contains(extension.ToLower()))
@@ -635,50 +706,29 @@ namespace EasySave.Model
                             }
                             catch
                             {
-                                encryptionTimeMs = -1; // Indicates encryption failure
+                                encryptionTimeMs = -1;
                             }
                         }
+
                         var endTime = DateTime.Now;
+                        var fileInfo = new FileInfo(file);
+                        _logger.LogTransfer(backupName, file, destFile, fileInfo.Length,
+                            (endTime - startTime).TotalMilliseconds, encryptionTimeMs);
 
-                        // Log the file transfer
-                        _logger.LogTransfer(
-                            backupName,
-                            file,
-                            destFile,
-                            fileInfo.Length,
-                            (endTime - startTime).TotalMilliseconds,
-                            encryptionTimeMs
-                        );
-
-                        // Update state after successful copy
-                        _stateTracker.UpdateState(backupName, "InProgress",
-                            filesCopied: i + 1, sizeCopied: fileInfo.Length);
+                        _stateTracker.UpdateState(backupName, "InProgress", filesCopied: i + 1, sizeCopied: fileInfo.Length);
                     }
                     catch (Exception ex)
                     {
-                        // Log failed transfer with negative transfer time
-                        _logger.LogTransfer(
-                            backupName,
-                            file,
-                            destFile,
-                            new FileInfo(file).Length,
-                            -1, // Negative value indicates failure
-                            -1  // Negative value indicates failure
-                        );
-
-                        _stateTracker.UpdateState(backupName, "Error",
-                            currentSource: file, currentTarget: destFile);
+                        _logger.LogTransfer(backupName, file, destFile, new FileInfo(file).Length, -1, -1);
+                        _stateTracker.UpdateState(backupName, "Error", currentSource: file, currentTarget: destFile);
                     }
                 }
             }
 
-            // Handle subdirectories recursively
+            // Sous-dossiers récursivement
             foreach (var subDir in Directory.GetDirectories(sourceDir))
             {
-                // Check for cancellation before each subdirectory
                 _cancellationTokenSource.Token.ThrowIfCancellationRequested();
-
-                // Check for pause before each subdirectory
                 await _pauseTokenSource.WaitWhilePausedAsync();
 
                 string dirName = Path.GetFileName(subDir);

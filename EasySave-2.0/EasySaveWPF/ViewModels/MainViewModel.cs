@@ -28,7 +28,6 @@ namespace EasySaveWPF.ViewModels
         private bool _wasBackupStopped;
 
 
-
         public bool IsSettingsDialogOpen { get; set; }
         public int SelectedLogFormat { get; set; } = 0; // 0 = JSON, 1 = XML
         public string BusinessSoftwareName { get; set; } = "Calculator";
@@ -134,34 +133,6 @@ namespace EasySaveWPF.ViewModels
         {
             get => _canStopBackup;
             set { _canStopBackup = value; OnPropertyChanged(); }
-        }
-
-        private int _backupProgressPercentage;
-        public int BackupProgressPercentage
-        {
-            get => _backupProgressPercentage;
-            set { _backupProgressPercentage = value; OnPropertyChanged(); }
-        }
-
-        private string _currentBackupName;
-        public string CurrentBackupName
-        {
-            get => _currentBackupName;
-            set { _currentBackupName = value; OnPropertyChanged(); }
-        }
-
-        private string _currentOperation;
-        public string CurrentOperation
-        {
-            get => _currentOperation;
-            set { _currentOperation = value; OnPropertyChanged(); }
-        }
-
-        private string _progressHeader;
-        public string ProgressHeader
-        {
-            get => _progressHeader;
-            set { _progressHeader = value; OnPropertyChanged(); }
         }
 
 
@@ -399,7 +370,7 @@ namespace EasySaveWPF.ViewModels
                 BackupName = NewBackupName,
                 Source = NewBackupSource,
                 Target = NewBackupTarget,
-                Type = NewBackupType
+                Type = NewBackupType + 1
             };
 
             var (isValid, message) = _backupService.ValidateBackup(newBackup);
@@ -519,11 +490,6 @@ namespace EasySaveWPF.ViewModels
                 return;
             }
 
-            // Initialize progress
-            BackupProgressPercentage = 0;
-            CurrentBackupName = string.Join(", ", selected.Select(b => b.BackupName));
-            CurrentOperation = _localization["PreparingBackup"];
-
             CanPauseBackup = true;
             CanStopBackup = true;
             CanResumeBackup = false;
@@ -534,13 +500,10 @@ namespace EasySaveWPF.ViewModels
             {
                 var names = selected.Select(b => b.BackupName).ToList();
 
-                // Subscribe to state changes
-                _backupService.StateChanged += OnBackupStateChanged;
-
-                // Run in background thread
+                // ⚠️ Lancer dans un thread de fond pour ne pas bloquer l’UI
                 var results = await Task.Run(() =>
                 {
-                    return _backupService.ExecuteBackups(names);
+                    return _backupService.ExecuteBackupsInParallel(names);
                 });
 
                 if (results != null && !_wasBackupStopped)
@@ -550,7 +513,7 @@ namespace EasySaveWPF.ViewModels
             }
             catch (OperationCanceledException)
             {
-                // StopBackup handles the message
+                // StopBackup gère déjà le message
             }
             catch (Exception ex)
             {
@@ -558,33 +521,13 @@ namespace EasySaveWPF.ViewModels
             }
             finally
             {
-                _backupService.StateChanged -= OnBackupStateChanged;
                 CanPauseBackup = false;
                 CanStopBackup = false;
                 CanResumeBackup = false;
                 _isBackupRunning = false;
-
-                // Reset progress
-                BackupProgressPercentage = 0;
-                CurrentBackupName = string.Empty;
-                CurrentOperation = string.Empty;
             }
         }
 
-        private void OnBackupStateChanged(object sender, BackupStateEventArgs e)
-        {
-            // Update progress on UI thread
-            System.Windows.Application.Current.Dispatcher.Invoke(() =>
-            {
-                if (e.TotalFiles > 0)
-                {
-                    BackupProgressPercentage = (int)((double)e.FilesCopied / e.TotalFiles * 100);
-                }
-
-                CurrentBackupName = e.BackupName;
-                CurrentOperation = e.State;
-            });
-        }
 
         private void BrowseUpdatedSource()
         {

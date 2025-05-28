@@ -42,52 +42,54 @@ namespace EasySave.Logging
 
             try
             {
-                List<LogEntry> entries = new List<LogEntry>();
-
-                // Read existing entries if file exists
-                if (File.Exists(logFile))
+                lock (typeof(XmlLogger)) // Global lock for all XmlLogger instances
                 {
-                    try
+                    List<LogEntry> entries = new List<LogEntry>();
+
+                    // Read existing entries if file exists
+                    if (File.Exists(logFile))
                     {
-                        var deserializer = new XmlSerializer(typeof(LogEntries)); // Renamed variable
-                        using (var reader = new StreamReader(logFile))
+                        try
                         {
-                            var existingEntries = (LogEntries)deserializer.Deserialize(reader);
-                            if (existingEntries != null && existingEntries.Entries != null)
+                            var deserializer = new XmlSerializer(typeof(LogEntries));
+                            using (var reader = new StreamReader(logFile))
                             {
-                                entries.AddRange(existingEntries.Entries);
+                                var existingEntries = (LogEntries)deserializer.Deserialize(reader);
+                                if (existingEntries != null && existingEntries.Entries != null)
+                                {
+                                    entries.AddRange(existingEntries.Entries);
+                                }
                             }
                         }
+                        catch (Exception ex)
+                        {
+                            entries = new List<LogEntry>();
+                        }
                     }
-                    catch (Exception ex)
+
+                    // Add new entry
+                    entries.Add(logEntry);
+
+                    // Write all entries back to file
+                    var logEntries = new LogEntries { Entries = entries };
+                    var settings = new XmlWriterSettings
                     {
-                        // If deserialization fails, start with empty list
-                        entries = new List<LogEntry>();
+                        Indent = true,
+                        IndentChars = "  ",
+                        NewLineChars = "\n",
+                        NewLineHandling = NewLineHandling.Replace
+                    };
+
+                    var serializer = new XmlSerializer(typeof(LogEntries));
+                    using (var writer = XmlWriter.Create(logFile, settings))
+                    {
+                        serializer.Serialize(writer, logEntries);
                     }
-                }
-
-                // Add new entry
-                entries.Add(logEntry);
-
-                // Write all entries back to file
-                var logEntries = new LogEntries { Entries = entries };
-                var settings = new XmlWriterSettings
-                {
-                    Indent = true,
-                    IndentChars = "  ",
-                    NewLineChars = "\n",
-                    NewLineHandling = NewLineHandling.Replace
-                };
-
-                var serializer = new XmlSerializer(typeof(LogEntries)); // No conflict now
-                using (var writer = XmlWriter.Create(logFile, settings))
-                {
-                    serializer.Serialize(writer, logEntries);
                 }
             }
             catch (Exception ex)
             {
-                // Fail silently or add error handling as needed
+                // Handle error
             }
         }
     }
