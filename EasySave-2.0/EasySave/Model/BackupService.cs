@@ -591,7 +591,8 @@ namespace EasySave.Model
 
         public void SetEncryptionExtensions(List<string> extensions)
         {
-            _encryptionExtensions = extensions;
+            _encryptionExtensions = extensions ?? new List<string>();
+            EncryptionService.Instance.Configure(_encryptionKey, _encryptionExtensions);
         }
 
         public void SetEncryptionKey(string key)
@@ -599,25 +600,10 @@ namespace EasySave.Model
             if (!string.IsNullOrWhiteSpace(key))
             {
                 _encryptionKey = key;
+                EncryptionService.Instance.Configure(_encryptionKey, _encryptionExtensions);
             }
         }
 
-        private void EncryptFileIfNeeded(string filePath, string backupName)
-        {
-            var extension = Path.GetExtension(filePath);
-            if (!_encryptionExtensions.Contains(extension.ToLower()))
-                return;
-
-            try
-            {
-                var fileManager = new FileManager(filePath, _encryptionKey); // Use field here
-                int encryptionTime = fileManager.TransformFile();
-            }
-            catch (Exception ex)
-            {
-                // Error handling
-            }
-        }
 
         private async Task CopyDirectoryAsync(string sourceDir, string targetDir, string backupName, bool isFullBackup, string lastBackupPath)
         {
@@ -701,8 +687,7 @@ namespace EasySave.Model
                         {
                             try
                             {
-                                var fileManager = new FileManager(destFile, _encryptionKey);
-                                encryptionTimeMs = fileManager.TransformFile();
+                                encryptionTimeMs = EncryptionService.Instance.EncryptFile(destFile);
                             }
                             catch
                             {

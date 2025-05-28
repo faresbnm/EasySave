@@ -31,13 +31,35 @@ public class FileManager(string path, string key)
     public int TransformFile()
     {
         if (!CheckFile()) return -1;
-        Stopwatch stopwatch = Stopwatch.StartNew();
-        var fileBytes = File.ReadAllBytes(FilePath);
-        var keyBytes = ConvertToByte(Key);
-        fileBytes = XorMethod(fileBytes, keyBytes);
-        File.WriteAllBytes(FilePath, fileBytes);
-        stopwatch.Stop();
-        return (int)stopwatch.ElapsedMilliseconds;
+
+        try
+        {
+            Stopwatch stopwatch = Stopwatch.StartNew();
+
+            // Read file with shared read access
+            byte[] fileBytes;
+            using (var fs = new FileStream(FilePath, FileMode.Open, FileAccess.Read, FileShare.Read))
+            {
+                fileBytes = new byte[fs.Length];
+                fs.Read(fileBytes, 0, (int)fs.Length);
+            }
+
+            var keyBytes = ConvertToByte(Key);
+            fileBytes = XorMethod(fileBytes, keyBytes);
+
+            // Write file with exclusive access
+            using (var fs = new FileStream(FilePath, FileMode.Create, FileAccess.Write, FileShare.None))
+            {
+                fs.Write(fileBytes, 0, fileBytes.Length);
+            }
+
+            stopwatch.Stop();
+            return (int)stopwatch.ElapsedMilliseconds;
+        }
+        catch (Exception ex)
+        {
+            return -1;
+        }
     }
 
     /// <summary>
