@@ -24,6 +24,12 @@ namespace EasySave.Model
         private object _lock = new object();
         private List<string> _encryptionExtensions = new List<string>();
         private string _encryptionKey = "123";
+        public event EventHandler<BackupStateEventArgs> StateChanged;
+
+        protected virtual void OnStateChanged(BackupStateEventArgs e)
+        {
+            StateChanged?.Invoke(this, e);
+        }
 
 
         public BackupService(ILocalizationService localization)
@@ -518,6 +524,12 @@ namespace EasySave.Model
 
         private async Task CopyDirectoryAsync(string sourceDir, string targetDir, string backupName, bool isFullBackup, string lastBackupPath)
         {
+
+            var fileCount = isFullBackup
+            ? CountFiles(sourceDir)
+            : CountChangedFiles(sourceDir, lastBackupPath ?? sourceDir);
+
+            long cumulativeSizeCopied = 0;
             string timestampedFolder = GetTimestampedFolderName(backupName);
             string backupTargetDir = Path.Combine(targetDir, timestampedFolder);
 
@@ -541,6 +553,15 @@ namespace EasySave.Model
             if (!hasChanges)
             {
                 _stateTracker.UpdateState(backupName, "NoChanges");
+                OnStateChanged(new BackupStateEventArgs
+                {
+                    BackupName = backupName,
+                    State = "NoChanges",
+                    FilesCopied = 0,
+                    TotalFiles = fileCount.Count,
+                    SizeCopied = 0,
+                    TotalSize = fileCount.TotalSize
+                });
                 return; // No changes, skip backup
             }
 
@@ -580,9 +601,22 @@ namespace EasySave.Model
                 {
                     try
                     {
+                        var fileInfo = new FileInfo(file);
+                        long fileSize = fileInfo.Length;
                         // Update state before copying
                         _stateTracker.UpdateState(backupName, "InProgress",
                             currentSource: file, currentTarget: destFile);
+
+                        cumulativeSizeCopied += fileSize;
+                        OnStateChanged(new BackupStateEventArgs
+                        {
+                            BackupName = backupName,
+                            State = "InProgress",
+                            FilesCopied = i + 1,
+                            TotalFiles = fileCount.Count,
+                            SizeCopied = cumulativeSizeCopied,
+                            TotalSize = fileCount.TotalSize
+                        });
 
                         var startTime = DateTime.Now;
 
@@ -607,7 +641,6 @@ namespace EasySave.Model
                         var endTime = DateTime.Now;
 
                         // Log the file transfer
-                        var fileInfo = new FileInfo(file);
                         _logger.LogTransfer(
                             backupName,
                             file,

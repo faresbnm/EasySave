@@ -66,6 +66,7 @@
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
 
         <!-- Action Buttons -->
@@ -161,6 +162,18 @@
                     </ListView.View>
                 </ListView>
             </Grid>
+        </GroupBox>
+
+        <!-- Progress Indicator -->
+        <GroupBox Header="{Binding ProgressHeader}" Grid.Row="3" Margin="0,10,0,0">
+            <StackPanel Orientation="Vertical">
+                <ProgressBar Minimum="0" Maximum="100" Value="{Binding BackupProgressPercentage}" 
+                     Height="20" Margin="5"/>
+                <TextBlock Text="{Binding BackupProgressPercentage, StringFormat={}{0}%}" 
+                   HorizontalAlignment="Center" Margin="5"/>
+                <TextBlock Text="{Binding CurrentBackupName}" FontWeight="Bold" HorizontalAlignment="Center"/>
+                <TextBlock Text="{Binding CurrentOperation}" FontStyle="Italic" HorizontalAlignment="Center"/>
+            </StackPanel>
         </GroupBox>
 
         <!-- Settings Dialog -->
