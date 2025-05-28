@@ -173,7 +173,8 @@ namespace EasySave.Controllers
                 return;
             }
 
-            var results = _backupService.ExecuteBackups(backupNames);
+            // Await the task to get the results before iterating
+            var results = _backupService.ExecuteBackups(backupNames).Result;
 
             foreach (var result in results)
             {

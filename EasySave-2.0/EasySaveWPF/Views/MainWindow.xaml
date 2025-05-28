@@ -66,6 +66,7 @@
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
 
         <!-- Action Buttons -->
@@ -77,6 +78,7 @@
                         <TextBlock Text="{Binding AddBackupButtonText}"/>
                     </StackPanel>
                 </Button>
+
 
                 <Button Command="{Binding OpenUpdateBackupDialogCommand}" Width="120" Margin="0,0,10,0">
                     <StackPanel Orientation="Horizontal">
@@ -118,24 +120,62 @@
                     </StackPanel>
                 </Button>
 
-                <Button Command="{Binding ResumeBackupCommand}" Width="80" Margin="0,0,10,0"
-                IsEnabled="{Binding CanResumeBackup}" ToolTip="{Binding ResumeButtonText}">
+                <Button Command="{Binding DeleteBackupCommand}" Width="120" Margin="0,0,10,0">
                     <StackPanel Orientation="Horizontal">
-                        <Path Data="M0,0 L14,7 L0,14 Z" 
-                      Fill="Green" Stretch="Uniform" Width="16" Height="16"/>
-                        <TextBlock Text="{Binding ResumeButtonText}" Margin="5,0,0,0"/>
+                        <TextBlock Text="🗑️" FontSize="16" Margin="0,0,5,0"/>
+                        <TextBlock Text="{Binding DeleteBackupButtonText}"/>
                     </StackPanel>
                 </Button>
 
+
+                <Button Command="{Binding ExecuteBackupCommand}" Width="120" Margin="0,0,10,0">
+
             <Button Command="{Binding StopBackupCommand}" Width="80" Margin="0,0,10,0"
                 IsEnabled="{Binding CanStopBackup}" ToolTip="{Binding StopButtonText}">
+
                     <StackPanel Orientation="Horizontal">
-                        <Rectangle Width="14" Height="14" Fill="Red"/>
-                        <TextBlock Text="{Binding StopButtonText}" Margin="5,0,0,0"/>
+                        <TextBlock Text="🚀" FontSize="16" Margin="0,0,5,0"/>
+                        <TextBlock Text="{Binding ExecuteBackupButtonText}"/>
+                    </StackPanel>
+                </Button>
+
+                <Button Command="{Binding OpenSettingsDialogCommand}" Width="120" Margin="10,0,0,0">
+                    <StackPanel Orientation="Horizontal">
+                        <TextBlock Text="⚙️" FontSize="16" Margin="0,0,5,0"/>
+                        <TextBlock Text="{Binding SettingsButtonText}"/>
                     </StackPanel>
                 </Button>
             </StackPanel>
         
+
+        <StackPanel HorizontalAlignment="Center" Orientation="Horizontal" Margin="0,10,0,0">
+            <Button Command="{Binding PauseBackupCommand}" Width="80" Margin="0,0,10,0"
+                IsEnabled="{Binding CanPauseBackup}" ToolTip="{Binding PauseButtonText}">
+                <StackPanel Orientation="Horizontal">
+                    <Path Data="M0,0 H6 V14 H0 Z M9,0 H15 V14 H9 Z" 
+                      Fill="WHITE" Stretch="Uniform" Width="16" Height="16"/>
+                    <TextBlock Text="{Binding PauseButtonText}" Margin="5,0,0,0"/>
+                </StackPanel>
+            </Button>
+
+            <Button Command="{Binding ResumeBackupCommand}" Width="80" Margin="0,0,10,0"
+                IsEnabled="{Binding CanResumeBackup}" ToolTip="{Binding ResumeButtonText}">
+                <StackPanel Orientation="Horizontal">
+                    <Path Data="M0,0 L14,7 L0,14 Z" 
+                      Fill="Green" Stretch="Uniform" Width="16" Height="16"/>
+                    <TextBlock Text="{Binding ResumeButtonText}" Margin="5,0,0,0"/>
+                </StackPanel>
+            </Button>
+
+            <Button Command="{Binding StopBackupCommand}" Width="80" Margin="0,0,10,0"
+                IsEnabled="{Binding CanStopBackup}" ToolTip="{Binding StopButtonText}">
+                <StackPanel Orientation="Horizontal">
+                    <Rectangle Width="14" Height="14" Fill="Red"/>
+                    <TextBlock Text="{Binding StopButtonText}" Margin="5,0,0,0"/>
+                </StackPanel>
+            </Button>
+        </StackPanel>
+
 
         <!-- Backup List -->
         <GroupBox Header="{Binding BackupListHeader}" Grid.Row="2">
@@ -163,12 +203,25 @@
             </Grid>
         </GroupBox>
 
+        <!-- Progress Indicator -->
+        <GroupBox Header="{Binding ProgressHeader}" Grid.Row="3" Margin="0,10,0,0">
+            <StackPanel Orientation="Vertical">
+                <ProgressBar Minimum="0" Maximum="100" Value="{Binding BackupProgressPercentage}" 
+                     Height="20" Margin="5"/>
+                <TextBlock Text="{Binding BackupProgressPercentage, StringFormat={}{0}%}" 
+                   HorizontalAlignment="Center" Margin="5"/>
+                <TextBlock Text="{Binding CurrentBackupName}" FontWeight="Bold" HorizontalAlignment="Center"/>
+                <TextBlock Text="{Binding CurrentOperation}" FontStyle="Italic" HorizontalAlignment="Center"/>
+            </StackPanel>
+        </GroupBox>
+
         <!-- Settings Dialog -->
         <!-- Page de paramètres -->
         <Grid Visibility="{Binding IsSettingsDialogOpen, Converter={StaticResource BooleanToVisibilityConverter}}"
       Panel.ZIndex="5" Grid.RowSpan="3" Background="#80000000">
             <Border Background="Black" Width="400" Padding="20" HorizontalAlignment="Center" VerticalAlignment="Center">
                 <ScrollViewer VerticalScrollBarVisibility="Auto">
+
                 <StackPanel>
                     <TextBlock Text="{Binding SettingsButtonText}" FontWeight="Bold" FontSize="16" Margin="0,0,0,10"/>
                     
@@ -179,37 +232,44 @@
                         <Button Content="Français" Command="{Binding ChangeLanguageCommand}" CommandParameter="fr" Margin="5"/>
                     </StackPanel>
 
-                    <TextBlock Text="{Binding LogFormatText}" Margin="0,5,0,0"/>
-                    <ComboBox SelectedIndex="{Binding SelectedLogFormat}" Margin="0,0,0,10">
-                        <ComboBoxItem Content="JSON"/>
-                        <ComboBoxItem Content="XML"/>
-                    </ComboBox>
+                        <!-- Language Selection -->
+                        <TextBlock Text="{Binding SetLanguage}" Margin="0,0,0,10"/>
+                        <StackPanel Orientation="Horizontal" Grid.Row="0">
+                            <Button Content="English" Command="{Binding ChangeLanguageCommand}" CommandParameter="en" Margin="5"/>
+                            <Button Content="Français" Command="{Binding ChangeLanguageCommand}" CommandParameter="fr" Margin="5"/>
+                        </StackPanel>
 
-                    <TextBlock Text="{Binding ExtensionText}" Margin="0,5,0,0"/>
-                    <TextBox Text="{Binding EncryptionExtensions}" Margin="0,0,0,10"/>
+                        <TextBlock Text="{Binding LogFormatText}" Margin="0,5,0,0"/>
+                        <ComboBox SelectedIndex="{Binding SelectedLogFormat}" Margin="0,0,0,10">
+                            <ComboBoxItem Content="JSON"/>
+                            <ComboBoxItem Content="XML"/>
+                        </ComboBox>
 
-                    <TextBlock Text="{Binding SoftwareText}" Margin="0,5,0,0"/>
-                    <TextBox Text="{Binding BusinessSoftwareName}" Margin="0,0,0,15"/>
+                        <TextBlock Text="{Binding ExtensionText}" Margin="0,5,0,0"/>
+                        <TextBox Text="{Binding EncryptionExtensions}" Margin="0,0,0,10"/>
 
-                    <TextBlock Text="{Binding ExtensionText}" Margin="0,5,0,0"/>
-                    <StackPanel Orientation="Horizontal" Margin="0,5,0,10">
-                        <TextBox Text="{Binding NewExtension, UpdateSourceTrigger=PropertyChanged}" Width="100" Margin="0,0,5,0"/>
-                        <Button Content="{Binding AddExtensionButtonText}" Command="{Binding AddExtensionCommand}" Width="60"/>
-                    </StackPanel>
+                        <TextBlock Text="{Binding SoftwareText}" Margin="0,5,0,0"/>
+                        <TextBox Text="{Binding BusinessSoftwareName}" Margin="0,0,0,15"/>
 
-                    <ListBox ItemsSource="{Binding EncryptionExtensions}" Height="100" Margin="0,0,0,10">
-                        <ListBox.ItemTemplate>
-                            <DataTemplate> 
-                                <StackPanel Orientation="Horizontal">
-                                    <TextBlock Text="{Binding}" Margin="0,0,5,0"/>
-                                    <Button Content="X" Command="{Binding DataContext.RemoveExtensionCommand, RelativeSource={RelativeSource AncestorType=ListBox}}" 
+                        <TextBlock Text="{Binding ExtensionText}" Margin="0,5,0,0"/>
+                        <StackPanel Orientation="Horizontal" Margin="0,5,0,10">
+                            <TextBox Text="{Binding NewExtension, UpdateSourceTrigger=PropertyChanged}" Width="100" Margin="0,0,5,0"/>
+                            <Button Content="{Binding AddExtensionButtonText}" Command="{Binding AddExtensionCommand}" Width="60"/>
+                        </StackPanel>
+
+                        <ListBox ItemsSource="{Binding EncryptionExtensions}" Height="100" Margin="0,0,0,10">
+                            <ListBox.ItemTemplate>
+                                <DataTemplate>
+                                    <StackPanel Orientation="Horizontal">
+                                        <TextBlock Text="{Binding}" Margin="0,0,5,0"/>
+                                        <Button Content="X" Command="{Binding DataContext.RemoveExtensionCommand, RelativeSource={RelativeSource AncestorType=ListBox}}" 
                                     CommandParameter="{Binding}"/>
-                                </StackPanel>
-                            </DataTemplate>
-                        </ListBox.ItemTemplate>
-                    </ListBox>
-                    <TextBlock Text="{Binding EncryptionKeyText}" Margin="0,5,0,0"/>
-                    <PasswordBox helpers:PasswordBoxHelper.BoundPassword="{Binding EncryptionKey, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
+                                    </StackPanel>
+                                </DataTemplate>
+                            </ListBox.ItemTemplate>
+                        </ListBox>
+                        <TextBlock Text="{Binding EncryptionKeyText}" Margin="0,5,0,0"/>
+                        <PasswordBox helpers:PasswordBoxHelper.BoundPassword="{Binding EncryptionKey, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
              Margin="0,0,0,15" Width="200" HorizontalAlignment="Left"/>
 
                     <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
