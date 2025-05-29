@@ -673,7 +673,6 @@ namespace EasySave.Model
 
                         var startTime = DateTime.Now;
 
-                        // 🟢 ✅ Ici, la **copie asynchrone**
                         using (var sourceStream = new FileStream(file, FileMode.Open, FileAccess.Read, FileShare.Read, 4096, useAsync: true))
                         using (var destinationStream = new FileStream(destFile, FileMode.Create, FileAccess.Write, FileShare.None, 4096, useAsync: true))
                         {

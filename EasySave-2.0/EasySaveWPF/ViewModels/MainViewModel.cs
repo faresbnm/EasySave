@@ -8,6 +8,7 @@ using System.Windows;
 using System.Windows.Forms;
 using System.Linq;
 using EasySave.Logging;
+using EasySaveWPF.Settings;
 
 namespace EasySaveWPF.ViewModels
 {
@@ -26,6 +27,8 @@ namespace EasySaveWPF.ViewModels
         private bool _canResumeBackup;
         private bool _canStopBackup;
         private bool _wasBackupStopped;
+        private readonly SettingsService _settingsService = new();
+        private UserSettings _currentSettings;
 
 
         public bool IsSettingsDialogOpen { get; set; }
@@ -52,6 +55,20 @@ namespace EasySaveWPF.ViewModels
         {
             _localization = localizationService;
             _backupService = backupService;
+
+            // Initialize settings service and load settings
+            _settingsService = new SettingsService();
+            _currentSettings = _settingsService.Load();
+
+            // Apply loaded settings to bound properties
+            SelectedLogFormat = _currentSettings.SelectedLogFormat;
+            BusinessSoftwareName = _currentSettings.BusinessSoftwareName;
+            EncryptionExtensions = new ObservableCollection<string>(_currentSettings.EncryptionExtensions ?? new());
+            EncryptionKey = _currentSettings.EncryptionKey;
+
+            // Language 
+            if (!string.IsNullOrEmpty(_currentSettings.Language))
+                ChangeLanguage(_currentSettings.Language);
 
             ChangeLanguageCommand = new RelayCommand<string>(ChangeLanguage);
             LoadBackupsCommand = new RelayCommand(LoadBackups);
@@ -568,14 +585,31 @@ namespace EasySaveWPF.ViewModels
         private void ApplySettings()
         {
             var format = SelectedLogFormat == 0 ? LogFormat.Json : LogFormat.Xml;
+
             _backupService.SetLogFormat(format);
             _backupService.SetEncryptionExtensions(EncryptionExtensions.ToList());
-            _backupService.SetEncryptionKey(EncryptionKey); 
+            _backupService.SetEncryptionKey(EncryptionKey);
 
+            // Update and save settings
+            _currentSettings = new UserSettings
+            {
+                SelectedLogFormat = SelectedLogFormat,
+                BusinessSoftwareName = BusinessSoftwareName,
+                EncryptionExtensions = EncryptionExtensions.ToList(),
+                EncryptionKey = EncryptionKey,
+                Language = _localization.CurrentLanguage // Assuming you store this
+            };
+
+            _settingsService.Save(_currentSettings);
+
+            // Close settings dialog
             IsSettingsDialogOpen = false;
             OnPropertyChanged(nameof(IsSettingsDialogOpen));
+
+            // Notify user
             System.Windows.MessageBox.Show(_localization["SettingsSavedSuccess"], _localization["Success"], MessageBoxButton.OK, MessageBoxImage.Information);
         }
+
 
         protected virtual void OnPropertyChanged([CallerMemberName] string propertyName = null)
         {

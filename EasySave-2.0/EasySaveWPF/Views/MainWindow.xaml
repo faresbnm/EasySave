@@ -59,6 +59,17 @@
                 </Setter.Value>
             </Setter>
         </Style>
+
+        <Style x:Key="DimmedButtonStyle" TargetType="Button">
+            <Setter Property="Opacity" Value="1"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Style.Triggers>
+                <Trigger Property="IsEnabled" Value="False">
+                    <Setter Property="Opacity" Value="0.4"/>
+                    <Setter Property="Cursor" Value="Arrow"/>
+                </Trigger>
+            </Style.Triggers>
+        </Style>
     </Window.Resources>
 
     <Grid Margin="10">
@@ -109,16 +120,16 @@
         </StackPanel>
 
         <StackPanel HorizontalAlignment="Center" Orientation="Horizontal" Margin="0,10,0,0">
-            <Button Command="{Binding PauseBackupCommand}" Width="80" Margin="0,0,10,0"
+            <Button Style="{StaticResource DimmedButtonStyle}" Command="{Binding PauseBackupCommand}" Width="80" Margin="0,0,10,0"
                 IsEnabled="{Binding CanPauseBackup}" ToolTip="{Binding PauseButtonText}">
                 <StackPanel Orientation="Horizontal">
                     <Path Data="M0,0 H6 V14 H0 Z M9,0 H15 V14 H9 Z" 
-                      Fill="WHITE" Stretch="Uniform" Width="16" Height="16"/>
+                      Fill="Black" Stretch="Uniform" Width="16" Height="16"/>
                     <TextBlock Text="{Binding PauseButtonText}" Margin="5,0,0,0"/>
                 </StackPanel>
             </Button>
 
-            <Button Command="{Binding ResumeBackupCommand}" Width="80" Margin="0,0,10,0"
+            <Button Style="{StaticResource DimmedButtonStyle}" Command="{Binding ResumeBackupCommand}" Width="80" Margin="0,0,10,0"
                 IsEnabled="{Binding CanResumeBackup}" ToolTip="{Binding ResumeButtonText}">
                 <StackPanel Orientation="Horizontal">
                     <Path Data="M0,0 L14,7 L0,14 Z" 
@@ -127,7 +138,7 @@
                 </StackPanel>
             </Button>
 
-            <Button Command="{Binding StopBackupCommand}" Width="80" Margin="0,0,10,0"
+            <Button Style="{StaticResource DimmedButtonStyle}" Command="{Binding StopBackupCommand}" Width="80" Margin="0,0,10,0"
                 IsEnabled="{Binding CanStopBackup}" ToolTip="{Binding StopButtonText}">
                 <StackPanel Orientation="Horizontal">
                     <Rectangle Width="14" Height="14" Fill="Red"/>
@@ -164,7 +175,6 @@
         </GroupBox>
 
         <!-- Settings Dialog -->
-        <!-- Page de paramètres -->
         <Grid Visibility="{Binding IsSettingsDialogOpen, Converter={StaticResource BooleanToVisibilityConverter}}"
       Panel.ZIndex="5" Grid.RowSpan="3" Background="#80000000">
             <Border Background="Black" Width="400" Padding="20" HorizontalAlignment="Center" VerticalAlignment="Center">
@@ -185,9 +195,6 @@
                             <ComboBoxItem Content="XML"/>
                         </ComboBox>
 
-                        <TextBlock Text="{Binding ExtensionText}" Margin="0,5,0,0"/>
-                        <TextBox Text="{Binding EncryptionExtensions}" Margin="0,0,0,10"/>
-
                         <TextBlock Text="{Binding SoftwareText}" Margin="0,5,0,0"/>
                         <TextBox Text="{Binding BusinessSoftwareName}" Margin="0,0,0,15"/>
 
@@ -197,20 +204,42 @@
                             <Button Content="{Binding AddExtensionButtonText}" Command="{Binding AddExtensionCommand}" Width="60"/>
                         </StackPanel>
 
-                        <ListBox ItemsSource="{Binding EncryptionExtensions}" Height="100" Margin="0,0,0,10">
+                        <ListBox ItemsSource="{Binding EncryptionExtensions}"
+         Height="100"
+         Margin="0,0,0,10"
+         HorizontalContentAlignment="Stretch">
                             <ListBox.ItemTemplate>
                                 <DataTemplate>
-                                    <StackPanel Orientation="Horizontal">
-                                        <TextBlock Text="{Binding}" Margin="0,0,5,0"/>
-                                        <Button Content="X" Command="{Binding DataContext.RemoveExtensionCommand, RelativeSource={RelativeSource AncestorType=ListBox}}" 
-                                    CommandParameter="{Binding}"/>
-                                    </StackPanel>
+                                    <Grid>
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="*" />
+                                            <ColumnDefinition Width="Auto" />
+                                        </Grid.ColumnDefinitions>
+
+                                        <TextBlock Text="{Binding}"
+                           VerticalAlignment="Center"
+                           Grid.Column="0" />
+
+                                        <Button Content="🗑️"
+                        Command="{Binding DataContext.RemoveExtensionCommand, RelativeSource={RelativeSource AncestorType=ListBox}}"
+                        CommandParameter="{Binding}"
+                        Grid.Column="1"
+                        VerticalAlignment="Center"
+                        HorizontalAlignment="Right"
+                        Margin="5,0,0,0"
+                        Cursor="Hand" />
+                                    </Grid>
                                 </DataTemplate>
                             </ListBox.ItemTemplate>
                         </ListBox>
+
+
                         <TextBlock Text="{Binding EncryptionKeyText}" Margin="0,5,0,0"/>
-                        <PasswordBox helpers:PasswordBoxHelper.BoundPassword="{Binding EncryptionKey, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}"
-             Margin="0,0,0,15" Width="200" HorizontalAlignment="Left"/>
+                        <PasswordBox 
+                        helpers:PasswordBoxHelper.BoundPassword="{Binding EncryptionKey, Mode=TwoWay}"
+                        Margin="0,0,0,15" 
+                        Width="200" 
+                        HorizontalAlignment="Left"/>
 
                         <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
                             <Button Content="{Binding CancelButtonText}" Command="{Binding CloseSettingsDialogCommand}" Margin="0,0,10,0" Width="80"/>
