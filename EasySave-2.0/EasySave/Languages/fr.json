@@ -49,7 +49,7 @@
     "BackupValid": "La sauvegarde est valide",
     "BackupCreatedSuccess": "Sauvegarde creee avec succes !",
     "BackupCreateFailed": "Echec de la creation de la sauvegarde : {0}",
-    "BackupDeletedSuccess": "Sauvegarde '{0}' supprimee avec succes",
+    "BackupDeletedSuccess": "Sauvegarde supprimée avec succes",
     "BackupDeleteFailed": "Echec de la suppression de la sauvegarde : {0}",
     "BackupNotFound": "Sauvegarde '{0}' non trouvee",
     "BackupUpdatedSuccess": "Sauvegarde mise a jour avec succes",
@@ -100,5 +100,6 @@
     "BackupPaused": "Sauvegarde en pause",
     "BackupResumed": "Sauvegarde résumée",
     "ExtensionAlreadyExists": "L'extension existe déjà",
-    "SelectBackupToDelete": "Vous devez sélectionner une sauvegarde à supprimer."
+    "SelectBackupToDelete": "Vous devez sélectionner une sauvegarde à supprimer.",
+    "CannotResumeSoftwarePause": "Impossible de lancer la sauvegarde, logiciel métier détécté: {0}"
 }
