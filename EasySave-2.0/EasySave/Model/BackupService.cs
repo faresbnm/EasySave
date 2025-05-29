@@ -369,7 +369,7 @@ namespace EasySave.Model
                     }
                     else // Differential backup
                     {
-                        string originalBackupPath = FindOriginalFullBackup(backup.Target, backup.BackupName);
+                        string originalBackupPath = backup.Type == 1 ? null : backup.Target;
                         if (originalBackupPath == null)
                         {
                             var fileCount = CountFiles(backup.Source);
@@ -607,8 +607,7 @@ namespace EasySave.Model
 
         private async Task CopyDirectoryAsync(string sourceDir, string targetDir, string backupName, bool isFullBackup, string lastBackupPath)
         {
-            string timestampedFolder = GetTimestampedFolderName(backupName);
-            string backupTargetDir = Path.Combine(targetDir, timestampedFolder);
+            string backupTargetDir = targetDir;
 
             // Première passe : vérifie s’il y a des changements
             bool hasChanges = false;
@@ -633,7 +632,6 @@ namespace EasySave.Model
                 return;
             }
 
-            // Crée le dossier
             Directory.CreateDirectory(backupTargetDir);
             var files = Directory.GetFiles(sourceDir);
 
@@ -708,8 +706,6 @@ namespace EasySave.Model
                     }
                 }
             }
-
-            // Sous-dossiers récursivement
             foreach (var subDir in Directory.GetDirectories(sourceDir))
             {
                 _cancellationTokenSource.Token.ThrowIfCancellationRequested();
