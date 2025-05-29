@@ -49,7 +49,7 @@
     "BackupValid": "Backup is valid",
     "BackupCreatedSuccess": "Backup created successfully!",
     "BackupCreateFailed": "Failed to create backup: {0}",
-    "BackupDeletedSuccess": "Backup '{0}' deleted successfully",
+    "BackupDeletedSuccess": "Backup deleted successfully",
     "BackupDeleteFailed": "Failed to delete backup: {0}",
     "BackupNotFound": "Backup '{0}' not found",
     "BackupUpdatedSuccess": "Backup updated successfully",
@@ -100,5 +100,6 @@
     "BackupPaused": "Backup paused",
     "BackupResumed": "Backup resumed",
     "ExtensionAlreadyExists": "Extension already exists",
-    "SelectBackupToDelete": "You have to select a backup to delete."
+    "SelectBackupToDelete": "You have to select a backup to delete.",
+    "CannotResumeSoftwarePause": "Cannot run backup, business software detected: {0}"
 }

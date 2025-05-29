@@ -9,6 +9,8 @@ using System.Windows.Forms;
 using System.Linq;
 using EasySave.Logging;
 using EasySaveWPF.Settings;
+using System.Diagnostics;
+using System.Timers;
 
 namespace EasySaveWPF.ViewModels
 {
@@ -29,6 +31,11 @@ namespace EasySaveWPF.ViewModels
         private bool _wasBackupStopped;
         private readonly SettingsService _settingsService = new();
         private UserSettings _currentSettings;
+        private System.Timers.Timer _monitoringTimer;
+        private bool _softwareWasRunning;
+        private readonly object _monitoringLock = new object();
+        private bool _isPausedBySoftware;
+
 
 
         public bool IsSettingsDialogOpen { get; set; }
@@ -59,6 +66,12 @@ namespace EasySaveWPF.ViewModels
             // Initialize settings service and load settings
             _settingsService = new SettingsService();
             _currentSettings = _settingsService.Load();
+
+            // Initialize the monitoring timer (check every 5 seconds)
+            _monitoringTimer = new System.Timers.Timer(2000);
+            _monitoringTimer.Elapsed += MonitorBusinessSoftware;
+            _monitoringTimer.AutoReset = true;
+            _monitoringTimer.Start();
 
             // Apply loaded settings to bound properties
             SelectedLogFormat = _currentSettings.SelectedLogFormat;
@@ -262,6 +275,53 @@ namespace EasySaveWPF.ViewModels
             }
         }
 
+        private void MonitorBusinessSoftware(object sender, ElapsedEventArgs e)
+        {
+            lock (_monitoringLock)
+            {
+                if (string.IsNullOrWhiteSpace(BusinessSoftwareName))
+                    return;
+
+                bool isRunning = IsProcessRunning(BusinessSoftwareName);
+
+                // If state changed
+                if (isRunning != _softwareWasRunning)
+                {
+                    _softwareWasRunning = isRunning;
+
+                    // Run on UI thread
+                    System.Windows.Application.Current.Dispatcher.Invoke(() =>
+                    {
+                        if (isRunning)
+                        {
+                            if (_isBackupRunning && !_isBackupPaused)
+                            {
+                                _isPausedBySoftware = true; // Mark as software-paused
+                                PauseBackup();
+                            }
+                        }
+                        else
+                        {
+                            if (_isBackupRunning && _isBackupPaused && _isPausedBySoftware)
+                            {
+                                _isPausedBySoftware = false; // Clear software-paused flag
+                                ResumeBackup();
+                            }
+                        }
+                    });
+                }
+            }
+        }
+
+        private bool IsProcessRunning(string processName)
+        {
+            // Remove .exe if present for more flexible matching
+            processName = processName.Replace(".exe", "").Replace(".EXE", "");
+
+            return Process.GetProcesses()
+                .Any(p => p.ProcessName.Contains(processName, StringComparison.OrdinalIgnoreCase));
+        }
+
         private void PauseBackup()
         {
             try
@@ -284,6 +344,17 @@ namespace EasySaveWPF.ViewModels
         {
             try
             {
+                // Prevent manual resume if paused by software
+                if (_isPausedBySoftware)
+                {
+                    System.Windows.MessageBox.Show(
+                       string.Format(_localization["CannotResumeSoftwarePause"], BusinessSoftwareName),
+                       _localization["Warning"],
+                       MessageBoxButton.OK,
+                       MessageBoxImage.Warning);
+                    return;
+                }
+
                 _backupService.ResumeBackup();
                 CanPauseBackup = true;
                 CanResumeBackup = false;
@@ -507,6 +578,17 @@ namespace EasySaveWPF.ViewModels
                 return;
             }
 
+            bool isSoftwareRunning = IsProcessRunning(BusinessSoftwareName);
+            if (isSoftwareRunning)
+            {
+                System.Windows.MessageBox.Show(
+                    string.Format(_localization["CannotResumeSoftwarePause"], BusinessSoftwareName),
+                    _localization["Warning"],
+                    MessageBoxButton.OK,
+                    MessageBoxImage.Warning);
+                return;
+            }
+
             CanPauseBackup = true;
             CanStopBackup = true;
             CanResumeBackup = false;
@@ -601,6 +683,13 @@ namespace EasySaveWPF.ViewModels
             };
 
             _settingsService.Save(_currentSettings);
+
+            // Reset monitoring state when settings change
+            lock (_monitoringLock)
+            {
+                _softwareWasRunning = IsProcessRunning(BusinessSoftwareName);
+            }
+
 
             // Close settings dialog
             IsSettingsDialogOpen = false;
