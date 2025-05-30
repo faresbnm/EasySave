@@ -26,7 +26,7 @@ namespace EasySaveWPF.Settings
                 // First install or missing file → return fully initialized default settings
                 return new UserSettings
                 {
-                    SelectedLogFormat = 1,
+                    SelectedLogFormat = 0,
                     BusinessSoftwareName = "",
                     EncryptionExtensions = new List<string>(),
                     EncryptionKey = "123",
