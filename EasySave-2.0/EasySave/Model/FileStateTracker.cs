@@ -68,9 +68,25 @@ namespace EasySave.Logging
             SaveStates();
         }
 
+        // Add these new methods:
+        public BackupState GetState(string backupName)
+        {
+            if (_currentStates.TryGetValue(backupName, out var state))
+            {
+                return state;
+            }
+            return null;
+        }
+
+        public List<BackupState> GetAllStates()
+        {
+            return _currentStates.Values.ToList();
+        }
+
         public void UpdateState(string backupName, string status, int totalFiles = 0, long totalSize = 0,
                               int filesCopied = 0, long sizeCopied = 0,
-                              string currentSource = null, string currentTarget = null)
+                              string currentSource = null, string currentTarget = null,
+                              bool hasPendingPriorityFiles = false)  // Added parameter
         {
             if (!_currentStates.TryGetValue(backupName, out var state))
             {
@@ -79,6 +95,7 @@ namespace EasySave.Logging
 
             state.Timestamp = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss.fff");
             state.Status = status;
+            state.HasPendingPriorityFiles = hasPendingPriorityFiles;  // Set the new property
 
             if (totalFiles > 0) state.TotalFiles = totalFiles;
             if (totalSize > 0) state.TotalSize = totalSize;
@@ -131,5 +148,6 @@ namespace EasySave.Logging
         public long RemainingSize { get; set; }
         public string CurrentSource { get; set; }
         public string CurrentTarget { get; set; }
+        public bool HasPendingPriorityFiles { get; set; }  // New property
     }
 }

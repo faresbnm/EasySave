@@ -101,5 +101,7 @@
     "BackupResumed": "Backup resumed",
     "ExtensionAlreadyExists": "Extension already exists",
     "SelectBackupToDelete": "You have to select a backup to delete.",
-    "CannotResumeSoftwarePause": "Cannot run backup, business software detected: {0}"
+    "CannotResumeSoftwarePause": "Cannot run backup, business software detected: {0}",
+    "PriorityExtensions": "Priority File Extensions",
+    "AddPriorityExtension": "Add"
 }
