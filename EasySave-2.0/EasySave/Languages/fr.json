@@ -101,5 +101,7 @@
     "BackupResumed": "Sauvegarde résumée",
     "ExtensionAlreadyExists": "L'extension existe déjà",
     "SelectBackupToDelete": "Vous devez sélectionner une sauvegarde à supprimer.",
-    "CannotResumeSoftwarePause": "Impossible de lancer la sauvegarde, logiciel métier détécté: {0}"
+    "CannotResumeSoftwarePause": "Impossible de lancer la sauvegarde, logiciel métier détécté: {0}",
+    "PriorityExtensions": "Extension des fichiers prioritaires",
+    "AddPriorityExtension": "Ajouter"
 }

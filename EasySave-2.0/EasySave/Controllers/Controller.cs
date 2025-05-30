@@ -81,11 +81,6 @@ namespace EasySave.Controllers
         private void AddBackup()
         {
             var currentBackups = _backupService.GetAllBackups();
-            if (currentBackups.Count >= BackupService.MaxBackups)
-            {
-                _view.ShowError("MaximumBackupsReached");
-                return;
-            }
 
             var (name, source, target, type) = _view.GetBackupInfo();
             var newBackup = new Backup(name, source, target, type);

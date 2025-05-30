@@ -16,7 +16,7 @@ namespace EasySave.Model
     {
         private readonly string _jsonFilePath;
         private readonly JsonSerializerOptions _jsonOptions;
-        public const int MaxBackups = 5;
+        //public const int MaxBackups = 5;
         private ILogger _logger;
         private readonly IStateTracker _stateTracker;
         private readonly ILocalizationService _localization;
@@ -24,8 +24,10 @@ namespace EasySave.Model
         private CancellationTokenSource _cancellationTokenSource;
         private object _lock = new object();
         private List<string> _encryptionExtensions = new List<string>();
+        private List<string> _priorityExtensions = new List<string>();
         private string _encryptionKey = "123";
-
+        private static readonly object _priorityLock = new object();
+        private static bool _priorityFilesPending = false;
 
         public BackupService(ILocalizationService localization)
         {
@@ -321,6 +323,12 @@ namespace EasySave.Model
                 _cancellationTokenSource?.Cancel();
             }
         }
+
+        public void SetPriorityExtensions(List<string> extensions)
+        {
+            _priorityExtensions = extensions ?? new List<string>();
+        }
+
         public async Task<List<string>> ExecuteBackupsInParallel(List<string> backupNames)
         {
             // Initialiser les tokens
@@ -609,23 +617,8 @@ namespace EasySave.Model
         {
             string backupTargetDir = targetDir;
 
-            // Première passe : vérifie s’il y a des changements
-            bool hasChanges = false;
-            if (!isFullBackup && lastBackupPath != null)
-            {
-                hasChanges = Directory.GetFiles(sourceDir, "*", SearchOption.AllDirectories)
-                    .Any(file => {
-                        string relativePath = file.Substring(sourceDir.Length + 1);
-                        string lastBackupFile = Path.Combine(lastBackupPath, relativePath);
-                        return !File.Exists(lastBackupFile) ||
-                               File.GetLastWriteTime(file) > File.GetLastWriteTime(lastBackupFile);
-                    });
-            }
-            else
-            {
-                hasChanges = true; // Full backup always has changes
-            }
-
+            // Check for changes
+            bool hasChanges = CheckForChanges(sourceDir, isFullBackup, lastBackupPath);
             if (!hasChanges)
             {
                 _stateTracker.UpdateState(backupName, "NoChanges");
@@ -633,9 +626,85 @@ namespace EasySave.Model
             }
 
             Directory.CreateDirectory(backupTargetDir);
-            var files = Directory.GetFiles(sourceDir);
 
-            for (int i = 0; i < files.Length; i++)
+            // First, collect all priority files in this directory and all subdirectories
+            var allPriorityFiles = Directory.GetFiles(sourceDir, "*", SearchOption.AllDirectories)
+                .Where(f => _priorityExtensions.Contains(Path.GetExtension(f).ToLower()))
+                .ToList();
+
+            // Process all priority files first, regardless of their directory level
+            if (allPriorityFiles.Count > 0)
+            {
+                lock (_priorityLock)
+                {
+                    _priorityFilesPending = true;
+                    _stateTracker.UpdateState(backupName, "InProgress", hasPendingPriorityFiles: true);
+                }
+
+                await ProcessFilesAsync(allPriorityFiles, backupTargetDir, backupName, isFullBackup, lastBackupPath);
+
+                lock (_priorityLock)
+                {
+                    _priorityFilesPending = ArePriorityFilesPendingInOtherJobs(backupName);
+                    _stateTracker.UpdateState(backupName, "InProgress", hasPendingPriorityFiles: _priorityFilesPending);
+                }
+            }
+
+            // Then process non-priority files only if no priority files are pending in any job
+            if (!_priorityFilesPending)
+            {
+                // Process files in current directory first
+                var currentDirNonPriorityFiles = Directory.GetFiles(sourceDir)
+                    .Where(f => !_priorityExtensions.Contains(Path.GetExtension(f).ToLower()))
+                    .ToList();
+
+                if (currentDirNonPriorityFiles.Count > 0)
+                {
+                    await ProcessFilesAsync(currentDirNonPriorityFiles, backupTargetDir, backupName, isFullBackup, lastBackupPath);
+                }
+
+                // Then process subdirectories
+                foreach (var subDir in Directory.GetDirectories(sourceDir))
+                {
+                    _cancellationTokenSource.Token.ThrowIfCancellationRequested();
+                    await _pauseTokenSource.WaitWhilePausedAsync();
+
+                    string dirName = Path.GetFileName(subDir);
+                    string destSubDir = Path.Combine(backupTargetDir, dirName);
+                    string lastBackupSubDir = lastBackupPath != null ? Path.Combine(lastBackupPath, dirName) : null;
+
+                    await CopyDirectoryAsync(subDir, destSubDir, backupName, isFullBackup, lastBackupSubDir);
+                }
+            }
+        }
+
+        private bool CheckForChanges(string sourceDir, bool isFullBackup, string lastBackupPath)
+        {
+            if (isFullBackup) return true;
+
+            if (lastBackupPath == null) return true;
+
+            return Directory.GetFiles(sourceDir, "*", SearchOption.AllDirectories)
+                .Any(file => {
+                    string relativePath = file.Substring(sourceDir.Length + 1);
+                    string lastBackupFile = Path.Combine(lastBackupPath, relativePath);
+                    return !File.Exists(lastBackupFile) ||
+                           File.GetLastWriteTime(file) > File.GetLastWriteTime(lastBackupFile);
+                });
+        }
+        private bool ArePriorityFilesPendingInOtherJobs(string currentBackupName)
+        {
+            var otherRunningBackups = _stateTracker.GetAllStates()
+                .Where(s => s.BackupName != currentBackupName &&
+                           (s.Status == "InProgress" || s.Status == "Paused"))
+                .ToList();
+
+            return otherRunningBackups.Any(b => b.HasPendingPriorityFiles);
+        }
+
+        private async Task ProcessFilesAsync(List<string> files, string targetDir, string backupName, bool isFullBackup, string lastBackupPath)
+        {
+            for (int i = 0; i < files.Count; i++)
             {
                 if (_cancellationTokenSource.IsCancellationRequested)
                 {
@@ -652,7 +721,7 @@ namespace EasySave.Model
 
                 string file = files[i];
                 string fileName = Path.GetFileName(file);
-                string destFile = Path.Combine(backupTargetDir, fileName);
+                string destFile = Path.Combine(targetDir, fileName);
 
                 bool shouldCopy = isFullBackup;
                 if (!isFullBackup)
@@ -677,7 +746,7 @@ namespace EasySave.Model
                             await sourceStream.CopyToAsync(destinationStream);
                         }
 
-                        // Encryption si besoin
+                        // Encryption if needed
                         double encryptionTimeMs = 0;
                         var extension = Path.GetExtension(file);
                         if (_encryptionExtensions.Contains(extension.ToLower()))
@@ -706,17 +775,14 @@ namespace EasySave.Model
                     }
                 }
             }
-            foreach (var subDir in Directory.GetDirectories(sourceDir))
-            {
-                _cancellationTokenSource.Token.ThrowIfCancellationRequested();
-                await _pauseTokenSource.WaitWhilePausedAsync();
+        }
 
-                string dirName = Path.GetFileName(subDir);
-                string destSubDir = Path.Combine(backupTargetDir, dirName);
-                string lastBackupSubDir = lastBackupPath != null ? Path.Combine(lastBackupPath, dirName) : null;
-
-                await CopyDirectoryAsync(subDir, destSubDir, backupName, isFullBackup, lastBackupSubDir);
-            }
+        private bool HasPendingPriorityFiles()
+        {
+            // Check all running backups for pending priority files
+            // This would need to be implemented based on your state tracking system
+            // For now, we'll just return false as a placeholder
+            return false;
         }
 
         private void CopyDirectory(string sourceDir, string targetDir, string backupName, bool isFullBackup, string lastBackupPath)

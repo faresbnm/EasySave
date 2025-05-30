@@ -35,7 +35,7 @@ namespace EasySaveWPF.ViewModels
         private bool _softwareWasRunning;
         private readonly object _monitoringLock = new object();
         private bool _isPausedBySoftware;
-
+        private ObservableCollection<string> _priorityExtensions { get; set; } = new ObservableCollection<string> { ".txt" };
 
 
         public bool IsSettingsDialogOpen { get; set; }
@@ -54,6 +54,10 @@ namespace EasySaveWPF.ViewModels
         public string EncryptionKeyText => _localization["EncryptionKey"];
 
         private string _encryptionKey = "123"; // Default key
+        public string NewPriorityExtension { get; set; }
+        public string PriorityExtensionsText => _localization["PriorityExtensions"];
+        public string AddPriorityExtensionButtonText => _localization["AddPriorityExtension"];
+        public string RemovePriorityExtensionButtonText => _localization["RemovePriorityExtension"];
 
 
         public event PropertyChangedEventHandler PropertyChanged;
@@ -78,6 +82,7 @@ namespace EasySaveWPF.ViewModels
             BusinessSoftwareName = _currentSettings.BusinessSoftwareName;
             EncryptionExtensions = new ObservableCollection<string>(_currentSettings.EncryptionExtensions ?? new());
             EncryptionKey = _currentSettings.EncryptionKey;
+            PriorityExtensions = new ObservableCollection<string>(_currentSettings.PriorityExtensions ?? new());
 
             // Language 
             if (!string.IsNullOrEmpty(_currentSettings.Language))
@@ -103,6 +108,8 @@ namespace EasySaveWPF.ViewModels
             PauseBackupCommand = new RelayCommand(PauseBackup, () => CanPauseBackup);
             ResumeBackupCommand = new RelayCommand(ResumeBackup, () => CanResumeBackup);
             StopBackupCommand = new RelayCommand(StopBackup, () => CanStopBackup);
+            AddPriorityExtensionCommand = new RelayCommand(AddPriorityExtension);
+            RemovePriorityExtensionCommand = new RelayCommand<string>(RemovePriorityExtension);
             CanPauseBackup = false;
             CanResumeBackup = false;
             CanStopBackup = false;
@@ -120,6 +127,16 @@ namespace EasySaveWPF.ViewModels
                 OnPropertyChanged();
                 OnPropertyChanged(nameof(NoBackupsText));
                 OnPropertyChanged(nameof(NoBackupsVisibility));
+            }
+        }
+
+        public ObservableCollection<string> PriorityExtensions
+        {
+            get => _priorityExtensions;
+            set
+            {
+                _priorityExtensions = value;
+                OnPropertyChanged();
             }
         }
 
@@ -220,6 +237,8 @@ namespace EasySaveWPF.ViewModels
         public ICommand PauseBackupCommand { get; }
         public ICommand ResumeBackupCommand { get; }
         public ICommand StopBackupCommand { get; }
+        public ICommand AddPriorityExtensionCommand { get; }
+        public ICommand RemovePriorityExtensionCommand { get; }
 
         private void ChangeLanguage(string languageCode)
         {
@@ -274,6 +293,35 @@ namespace EasySaveWPF.ViewModels
                 }
             }
         }
+        private void AddPriorityExtension()
+        {
+            if (!string.IsNullOrWhiteSpace(NewPriorityExtension))
+            {
+                if (!NewPriorityExtension.StartsWith("."))
+                {
+                    NewPriorityExtension = "." + NewPriorityExtension;
+                }
+
+                if (!PriorityExtensions.Contains(NewPriorityExtension))
+                {
+                    PriorityExtensions.Add(NewPriorityExtension);
+                    NewPriorityExtension = string.Empty;
+                    OnPropertyChanged(nameof(NewPriorityExtension));
+                }
+                else
+                {
+                    System.Windows.MessageBox.Show(_localization["ExtensionAlreadyExists"], _localization["Error"], MessageBoxButton.OK, MessageBoxImage.Warning);
+                }
+            }
+        }
+
+        private void RemovePriorityExtension(string extension)
+        {
+            if (PriorityExtensions.Contains(extension))
+            {
+                PriorityExtensions.Remove(extension);
+            }
+        }
 
         private void MonitorBusinessSoftware(object sender, ElapsedEventArgs e)
         {
@@ -317,6 +365,9 @@ namespace EasySaveWPF.ViewModels
         {
             // Remove .exe if present for more flexible matching
             processName = processName.Replace(".exe", "").Replace(".EXE", "");
+
+            if (string.IsNullOrWhiteSpace(processName))
+                return false;
 
             return Process.GetProcesses()
                 .Any(p => p.ProcessName.Contains(processName, StringComparison.OrdinalIgnoreCase));
@@ -671,6 +722,7 @@ namespace EasySaveWPF.ViewModels
             _backupService.SetLogFormat(format);
             _backupService.SetEncryptionExtensions(EncryptionExtensions.ToList());
             _backupService.SetEncryptionKey(EncryptionKey);
+            _backupService.SetPriorityExtensions(PriorityExtensions.ToList());
 
             // Update and save settings
             _currentSettings = new UserSettings
@@ -679,6 +731,7 @@ namespace EasySaveWPF.ViewModels
                 BusinessSoftwareName = BusinessSoftwareName,
                 EncryptionExtensions = EncryptionExtensions.ToList(),
                 EncryptionKey = EncryptionKey,
+                PriorityExtensions = PriorityExtensions.ToList(),
                 Language = _localization.CurrentLanguage // Assuming you store this
             };
 
