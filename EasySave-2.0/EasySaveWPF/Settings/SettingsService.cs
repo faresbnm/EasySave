@@ -22,7 +22,18 @@ namespace EasySaveWPF.Settings
         public UserSettings Load()
         {
             if (!File.Exists(ConfigPath))
-                return new UserSettings(); // default
+            {
+                // First install or missing file → return fully initialized default settings
+                return new UserSettings
+                {
+                    SelectedLogFormat = 0,
+                    BusinessSoftwareName = "",
+                    EncryptionExtensions = new List<string>(),
+                    EncryptionKey = "123",
+                    PriorityExtensions = new List<string>(),
+                    Language = "en"
+                };
+            }
 
             var json = File.ReadAllText(ConfigPath);
             return JsonSerializer.Deserialize<UserSettings>(json) ?? new UserSettings();
