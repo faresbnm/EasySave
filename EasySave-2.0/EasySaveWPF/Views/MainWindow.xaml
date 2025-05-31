@@ -276,6 +276,9 @@
                             </ListBox.ItemTemplate>
                         </ListBox>
 
+                        <TextBlock Text="Max Large File Size (KB)" Margin="0,5,0,0"/>
+                        <TextBox Text="{Binding MaxParallelTransferSizeKB, UpdateSourceTrigger=PropertyChanged}" Width="100" Margin="0,0,0,15"/>
+
                         <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
                             <Button Content="{Binding CancelButtonText}" Command="{Binding CloseSettingsDialogCommand}" Margin="0,0,10,0" Width="80"/>
                             <Button Content="{Binding SaveButtonText}" Command="{Binding ApplySettingsCommand}" Margin="0,0,10,0" Width="80"/>

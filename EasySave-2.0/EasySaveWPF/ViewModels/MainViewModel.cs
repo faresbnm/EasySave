@@ -36,6 +36,8 @@ namespace EasySaveWPF.ViewModels
         private readonly object _monitoringLock = new object();
         private bool _isPausedBySoftware;
         private ObservableCollection<string> _priorityExtensions { get; set; } = new ObservableCollection<string> { ".txt" };
+        private long _maxParallelTransferSizeKB;
+
 
 
         public bool IsSettingsDialogOpen { get; set; }
@@ -83,6 +85,8 @@ namespace EasySaveWPF.ViewModels
             EncryptionExtensions = new ObservableCollection<string>(_currentSettings.EncryptionExtensions ?? new());
             EncryptionKey = _currentSettings.EncryptionKey;
             PriorityExtensions = new ObservableCollection<string>(_currentSettings.PriorityExtensions ?? new());
+            MaxParallelTransferSizeKB = _currentSettings.MaxParallelTransferSizeKB;
+
 
             // Language 
             if (!string.IsNullOrEmpty(_currentSettings.Language))
@@ -180,6 +184,16 @@ namespace EasySaveWPF.ViewModels
         {
             get => _canStopBackup;
             set { _canStopBackup = value; OnPropertyChanged(); }
+        }
+
+        public long MaxParallelTransferSizeKB
+        {
+            get => _maxParallelTransferSizeKB;
+            set
+            {
+                _maxParallelTransferSizeKB = value;
+                OnPropertyChanged(nameof(MaxParallelTransferSizeKB));
+            }
         }
 
 
@@ -509,7 +523,7 @@ namespace EasySaveWPF.ViewModels
                 BackupName = NewBackupName,
                 Source = NewBackupSource,
                 Target = NewBackupTarget,
-                Type = NewBackupType + 1
+                Type = NewBackupType
             };
 
             var (isValid, message) = _backupService.ValidateBackup(newBackup);
@@ -529,7 +543,7 @@ namespace EasySaveWPF.ViewModels
             else
             {
                 System.Windows.MessageBox.Show(_localization[result], _localization["Error"], MessageBoxButton.OK, MessageBoxImage.Error);
-            }
+            } 
         }
 
         private void OpenUpdateBackupDialog()
@@ -723,6 +737,8 @@ namespace EasySaveWPF.ViewModels
             _backupService.SetEncryptionExtensions(EncryptionExtensions.ToList());
             _backupService.SetEncryptionKey(EncryptionKey);
             _backupService.SetPriorityExtensions(PriorityExtensions.ToList());
+            _backupService.SetMaxParallelTransferSizeKB(MaxParallelTransferSizeKB);
+
 
             // Update and save settings
             _currentSettings = new UserSettings
@@ -732,6 +748,7 @@ namespace EasySaveWPF.ViewModels
                 EncryptionExtensions = EncryptionExtensions.ToList(),
                 EncryptionKey = EncryptionKey,
                 PriorityExtensions = PriorityExtensions.ToList(),
+                MaxParallelTransferSizeKB = MaxParallelTransferSizeKB,
                 Language = _localization.CurrentLanguage // Assuming you store this
             };
 

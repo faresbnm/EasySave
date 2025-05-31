@@ -28,6 +28,9 @@ namespace EasySave.Model
         private string _encryptionKey = "123";
         private int _globalPriorityFileCount = 0;
         private static readonly object _priorityLock = new();
+        private long _maxParallelTransferSizeKB = 0;
+        private static readonly object _largeFileLock = new();
+        private static bool _largeFileInProgress = false;
 
         public BackupService(ILocalizationService localization)
         {
@@ -327,6 +330,11 @@ namespace EasySave.Model
         public void SetPriorityExtensions(List<string> extensions)
         {
             _priorityExtensions = extensions ?? new List<string>();
+        }
+
+        public void SetMaxParallelTransferSizeKB(long sizeKB)
+        {
+            _maxParallelTransferSizeKB = sizeKB;
         }
 
         public async Task<List<string>> ExecuteBackupsInParallel(List<string> backupNames)
@@ -725,29 +733,42 @@ namespace EasySave.Model
                 }
 
                 string file = files[i];
+                var fileInfo = new FileInfo(file);
+                bool isLargeFile = fileInfo.Length > (_maxParallelTransferSizeKB * 1024);
 
-                // ✅ Preserve the relative structure from sourceDir
-                string relativePath = Path.GetRelativePath(rootSourceDir, file); // see note below
-                string destFile = Path.Combine(targetDir, relativePath);
-
-                // ✅ Ensure destination directory exists
-                string destDirectory = Path.GetDirectoryName(destFile);
-                if (!Directory.Exists(destDirectory))
+                // Handle large files - only one at a time across all backups
+                if (isLargeFile)
                 {
-                    Directory.CreateDirectory(destDirectory);
+                    lock (_largeFileLock)
+                    {
+                        while (_largeFileInProgress)
+                        {
+                            Monitor.Wait(_largeFileLock);
+                        }
+                        _largeFileInProgress = true;
+                    }
                 }
 
-                bool shouldCopy = isFullBackup;
-                if (!isFullBackup && lastBackupPath != null)
+                try
                 {
-                    string lastBackupFile = Path.Combine(lastBackupPath, relativePath);
-                    shouldCopy = !File.Exists(lastBackupFile) ||
-                                 File.GetLastWriteTime(file) > File.GetLastWriteTime(lastBackupFile);
-                }
+                    string relativePath = Path.GetRelativePath(rootSourceDir, file);
+                    string destFile = Path.Combine(targetDir, relativePath);
 
-                if (shouldCopy)
-                {
-                    try
+                    string destDirectory = Path.GetDirectoryName(destFile);
+                    if (!Directory.Exists(destDirectory))
+                    {
+                        Directory.CreateDirectory(destDirectory);
+                    }
+
+                    bool shouldCopy = isFullBackup;
+                    if (!isFullBackup && lastBackupPath != null)
+                    {
+                        string lastBackupFile = Path.Combine(lastBackupPath, relativePath);
+                        shouldCopy = !File.Exists(lastBackupFile) ||
+                                     File.GetLastWriteTime(file) > File.GetLastWriteTime(lastBackupFile);
+                    }
+
+                    if (shouldCopy)
                     {
                         _stateTracker.UpdateState(backupName, "InProgress",
                             currentSource: file, currentTarget: destFile);
@@ -760,7 +781,6 @@ namespace EasySave.Model
                             await sourceStream.CopyToAsync(destinationStream);
                         }
 
-                        // Optional encryption
                         double encryptionTimeMs = 0;
                         var extension = Path.GetExtension(file);
                         if (_encryptionExtensions.Contains(extension.ToLower()))
@@ -776,25 +796,35 @@ namespace EasySave.Model
                         }
 
                         var endTime = DateTime.Now;
-                        var fileInfo = new FileInfo(file);
                         _logger.LogTransfer(backupName, file, destFile, fileInfo.Length,
                             (endTime - startTime).TotalMilliseconds, encryptionTimeMs);
 
                         _stateTracker.UpdateState(backupName, "InProgress", filesCopied: i + 1, sizeCopied: fileInfo.Length);
                     }
-                    catch (Exception ex)
-                    {
-                        _logger.LogTransfer(backupName, file, destFile, new FileInfo(file).Length, -1, -1);
-                        _stateTracker.UpdateState(backupName, "Error", currentSource: file, currentTarget: destFile);
-                    }
                 }
-
-                // Decrement global priority file count if this was a priority file
-                if (_priorityExtensions.Contains(Path.GetExtension(file).ToLower()))
+                catch (Exception ex)
                 {
-                    lock (_priorityLock)
+                    //_logger.LogTransfer(backupName, file, destFile, fileInfo.Length, -1, -1);
+                    //_stateTracker.UpdateState(backupName, "Error", currentSource: file, currentTarget: destFile);
+                }
+                finally
+                {
+                    if (isLargeFile)
                     {
-                        _globalPriorityFileCount--;
+                        lock (_largeFileLock)
+                        {
+                            _largeFileInProgress = false;
+                            Monitor.Pulse(_largeFileLock);
+                        }
+                    }
+
+                    // Decrement global priority file count if this was a priority file
+                    if (_priorityExtensions.Contains(Path.GetExtension(file).ToLower()))
+                    {
+                        lock (_priorityLock)
+                        {
+                            _globalPriorityFileCount--;
+                        }
                     }
                 }
             }
