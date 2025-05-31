@@ -12,8 +12,8 @@ namespace EasySaveWPF.Settings
         public string BusinessSoftwareName { get; set; }
         public List<string> EncryptionExtensions { get; set; } = new();
         public string EncryptionKey { get; set; }
-        public List<string> PriorityExtensions { get; set; } 
-
+        public List<string> PriorityExtensions { get; set; }
+        public long MaxParallelTransferSizeKB { get; set; }
         public string Language { get; set; }
     }
 }

@@ -31,6 +31,7 @@ namespace EasySaveWPF.Settings
                     EncryptionExtensions = new List<string>(),
                     EncryptionKey = "123",
                     PriorityExtensions = new List<string>(),
+                    MaxParallelTransferSizeKB = 0,
                     Language = "en"
                 };
             }
