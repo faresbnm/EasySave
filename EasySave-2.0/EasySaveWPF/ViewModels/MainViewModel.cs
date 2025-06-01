@@ -286,6 +286,16 @@ namespace EasySaveWPF.ViewModels
 
         }
 
+        private void RefreshBackupProgress()
+        {
+            foreach (var backup in Backups)
+            {
+                backup.ProgressPercentage = _backupService.GetBackupProgressPercentage(backup.BackupName);
+            }
+
+            OnPropertyChanged(nameof(Backups)); // Notify UI that backup list has updated
+        }
+
         private void AddExtension()
         {
             if (!string.IsNullOrWhiteSpace(NewExtension))
@@ -471,6 +481,9 @@ namespace EasySaveWPF.ViewModels
                 backup.TypeDisplay = backup.Type == 1
                     ? _localization["BackupTypeFull"]
                     : _localization["BackupTypeDifferential"];
+
+                // ADD THIS LINE
+                backup.ProgressPercentage = _backupService.GetBackupProgressPercentage(backup.BackupName);
             }
         }
 
@@ -660,9 +673,17 @@ namespace EasySaveWPF.ViewModels
             _isBackupRunning = true;
             _wasBackupStopped = false;
 
+            var refreshTimer = new System.Timers.Timer(1000); // Every second
+
+
             try
             {
                 var names = selected.Select(b => b.BackupName).ToList();
+                refreshTimer.Elapsed += (s, e) =>
+                {
+                    System.Windows.Application.Current.Dispatcher.Invoke(() => RefreshBackupProgress());
+                };
+                refreshTimer.Start();
 
                 // ⚠️ Lancer dans un thread de fond pour ne pas bloquer l’UI
                 var results = await Task.Run(() =>
@@ -689,6 +710,9 @@ namespace EasySaveWPF.ViewModels
                 CanStopBackup = false;
                 CanResumeBackup = false;
                 _isBackupRunning = false;
+
+                refreshTimer?.Stop();
+                refreshTimer?.Dispose();
             }
         }
 

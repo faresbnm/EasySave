@@ -91,6 +91,16 @@ namespace EasySave.Model
             }
         }
 
+        public double? GetBackupProgressPercentage(string backupName)
+        {
+            var state = _stateTracker.GetState(backupName);
+            if (state == null || state.TotalSize == 0)
+                return null;
+
+            double percentage = (double)state.SizeCopied / state.TotalSize * 100;
+            return Math.Round(percentage, 2); // Round to 2 decimal places
+        }
+
         public (bool isValid, string message) ValidateBackup(Backup newBackup)
         {
             var backups = GetAllBackups();
@@ -363,6 +373,9 @@ namespace EasySave.Model
 
                     _stateTracker.InitializeState(backup.BackupName);
 
+                    var tracker = new ProgressTracker();
+
+
                     if (backup.Type == 1) // Full backup
                     {
                         var fileCount = CountFiles(backup.Source);
@@ -378,7 +391,7 @@ namespace EasySave.Model
 
                         await _pauseTokenSource.WaitWhilePausedAsync();
 
-                        await CopyDirectoryAsync(backup.Source, backup.Target, backup.BackupName, true, null);
+                        await CopyDirectoryAsync(backup.Source, backup.Target, backup.BackupName, true, null, tracker);
                         results.Add(_localization.Format("FullBackupSuccess", backup.BackupName));
 
                         _stateTracker.UpdateState(backup.BackupName, "Completed");
@@ -400,7 +413,7 @@ namespace EasySave.Model
 
                             await _pauseTokenSource.WaitWhilePausedAsync();
 
-                            await CopyDirectoryAsync(backup.Source, backup.Target, backup.BackupName, true, null);
+                            await CopyDirectoryAsync(backup.Source, backup.Target, backup.BackupName, true, null, tracker);
                             results.Add(_localization.Format("DifferentialBackupSuccess", backup.BackupName));
                             _stateTracker.UpdateState(backup.BackupName, "Completed");
                         }
@@ -418,7 +431,7 @@ namespace EasySave.Model
 
                             await _pauseTokenSource.WaitWhilePausedAsync();
 
-                            await CopyDirectoryAsync(backup.Source, backup.Target, backup.BackupName, false, originalBackupPath);
+                            await CopyDirectoryAsync(backup.Source, backup.Target, backup.BackupName, true, null, tracker);
                             results.Add(_localization.Format("DifferentialBackupSuccess", backup.BackupName));
                             _stateTracker.UpdateState(backup.BackupName, "Completed");
                         }
@@ -466,6 +479,9 @@ namespace EasySave.Model
 
                     // Initialize state
                     _stateTracker.InitializeState(backup.BackupName);
+                    var tracker = new ProgressTracker();
+
+
 
                     if (backup.Type == 1) // Full backup
                     {
@@ -485,7 +501,7 @@ namespace EasySave.Model
                         // Wait if paused before starting
                         await _pauseTokenSource.WaitWhilePausedAsync();
 
-                        await CopyDirectoryAsync(backup.Source, backup.Target, backup.BackupName, true, null);
+                        await CopyDirectoryAsync(backup.Source, backup.Target, backup.BackupName, true, null, tracker);
                         results.Add(_localization.Format("FullBackupSuccess", backup.BackupName));
 
                         _stateTracker.UpdateState(backup.BackupName, "Completed");
@@ -511,7 +527,7 @@ namespace EasySave.Model
                             // Wait if paused before starting
                             await _pauseTokenSource.WaitWhilePausedAsync();
 
-                            await CopyDirectoryAsync(backup.Source, backup.Target, backup.BackupName, true, null);
+                            await CopyDirectoryAsync(backup.Source, backup.Target, backup.BackupName, true, null, tracker);
                             results.Add(_localization.Format("DifferentialBackupSuccess", backup.BackupName));
                             _stateTracker.UpdateState(backup.BackupName, "Completed");
                         }
@@ -533,7 +549,7 @@ namespace EasySave.Model
                             // Wait if paused before starting
                             await _pauseTokenSource.WaitWhilePausedAsync();
 
-                            await CopyDirectoryAsync(backup.Source, backup.Target, backup.BackupName, false, originalBackupPath);
+                            await CopyDirectoryAsync(backup.Source, backup.Target, backup.BackupName, true, null, tracker);
                             results.Add($"Differential backup '{backup.BackupName}' executed successfully");
                             _stateTracker.UpdateState(backup.BackupName, "Completed");
                         }
@@ -621,11 +637,10 @@ namespace EasySave.Model
         }
 
 
-        private async Task CopyDirectoryAsync(string sourceDir, string targetDir, string backupName, bool isFullBackup, string lastBackupPath)
+        private async Task CopyDirectoryAsync(string sourceDir, string targetDir, string backupName, bool isFullBackup, string lastBackupPath, ProgressTracker tracker)
         {
             string backupTargetDir = targetDir;
 
-            // Check for changes
             bool hasChanges = CheckForChanges(sourceDir, isFullBackup, lastBackupPath);
             if (!hasChanges)
             {
@@ -635,12 +650,11 @@ namespace EasySave.Model
 
             Directory.CreateDirectory(backupTargetDir);
 
-            // Get all priority files in this directory and subdirectories
+            // 🟥 PRIORITY FILES FIRST
             var allPriorityFiles = Directory.GetFiles(sourceDir, "*", SearchOption.AllDirectories)
                 .Where(f => _priorityExtensions.Contains(Path.GetExtension(f).ToLower()))
                 .ToList();
 
-            // Register priority file count globally
             if (allPriorityFiles.Count > 0)
             {
                 lock (_priorityLock)
@@ -649,13 +663,10 @@ namespace EasySave.Model
                 }
 
                 _stateTracker.UpdateState(backupName, "InProgress", hasPendingPriorityFiles: true);
-
-                await ProcessFilesAsync(allPriorityFiles, backupTargetDir, backupName, isFullBackup, lastBackupPath, sourceDir);
-
+                await ProcessFilesAsync(allPriorityFiles, backupTargetDir, backupName, isFullBackup, lastBackupPath, sourceDir, tracker);
                 _stateTracker.UpdateState(backupName, "InProgress", hasPendingPriorityFiles: false);
             }
 
-            // Wait until all global priority files are copied before processing non-priority files
             while (true)
             {
                 lock (_priorityLock)
@@ -666,17 +677,17 @@ namespace EasySave.Model
                 await Task.Delay(100);
             }
 
-            // Process non-priority files in current directory
+            // NON-PRIORITY FILES IN CURRENT DIR
             var currentDirNonPriorityFiles = Directory.GetFiles(sourceDir)
                 .Where(f => !_priorityExtensions.Contains(Path.GetExtension(f).ToLower()))
                 .ToList();
 
             if (currentDirNonPriorityFiles.Count > 0)
             {
-                await ProcessFilesAsync(currentDirNonPriorityFiles, backupTargetDir, backupName, isFullBackup, lastBackupPath, sourceDir);
+                await ProcessFilesAsync(currentDirNonPriorityFiles, backupTargetDir, backupName, isFullBackup, lastBackupPath, sourceDir, tracker);
             }
 
-            // Process subdirectories
+            // SUBDIRECTORIES
             foreach (var subDir in Directory.GetDirectories(sourceDir))
             {
                 _cancellationTokenSource.Token.ThrowIfCancellationRequested();
@@ -686,9 +697,11 @@ namespace EasySave.Model
                 string destSubDir = Path.Combine(backupTargetDir, dirName);
                 string lastBackupSubDir = lastBackupPath != null ? Path.Combine(lastBackupPath, dirName) : null;
 
-                await CopyDirectoryAsync(subDir, destSubDir, backupName, isFullBackup, lastBackupSubDir);
+                await CopyDirectoryAsync(subDir, destSubDir, backupName, isFullBackup, lastBackupSubDir, tracker);
             }
         }
+
+
 
 
         private bool CheckForChanges(string sourceDir, bool isFullBackup, string lastBackupPath)
@@ -715,7 +728,7 @@ namespace EasySave.Model
             return otherRunningBackups.Any(b => b.HasPendingPriorityFiles);
         }
 
-        private async Task ProcessFilesAsync(List<string> files, string targetDir, string backupName, bool isFullBackup, string lastBackupPath, string rootSourceDir)
+        private async Task ProcessFilesAsync(List<string> files, string targetDir, string backupName, bool isFullBackup, string lastBackupPath, string rootSourceDir, ProgressTracker tracker)
         {
             for (int i = 0; i < files.Count; i++)
             {
@@ -736,15 +749,12 @@ namespace EasySave.Model
                 var fileInfo = new FileInfo(file);
                 bool isLargeFile = fileInfo.Length > (_maxParallelTransferSizeKB * 1024);
 
-                // Handle large files - only one at a time across all backups
                 if (isLargeFile)
                 {
                     lock (_largeFileLock)
                     {
                         while (_largeFileInProgress)
-                        {
                             Monitor.Wait(_largeFileLock);
-                        }
                         _largeFileInProgress = true;
                     }
                 }
@@ -753,12 +763,7 @@ namespace EasySave.Model
                 {
                     string relativePath = Path.GetRelativePath(rootSourceDir, file);
                     string destFile = Path.Combine(targetDir, relativePath);
-
-                    string destDirectory = Path.GetDirectoryName(destFile);
-                    if (!Directory.Exists(destDirectory))
-                    {
-                        Directory.CreateDirectory(destDirectory);
-                    }
+                    Directory.CreateDirectory(Path.GetDirectoryName(destFile)!);
 
                     bool shouldCopy = isFullBackup;
                     if (!isFullBackup && lastBackupPath != null)
@@ -768,44 +773,50 @@ namespace EasySave.Model
                                      File.GetLastWriteTime(file) > File.GetLastWriteTime(lastBackupFile);
                     }
 
-                    if (shouldCopy)
+                    if (!shouldCopy)
+                        continue;
+
+                    _stateTracker.UpdateState(backupName, "InProgress", currentSource: file, currentTarget: destFile);
+
+                    var start = DateTime.Now;
+                    using (var source = new FileStream(file, FileMode.Open, FileAccess.Read, FileShare.Read, 4096, true))
+                    using (var dest = new FileStream(destFile, FileMode.Create, FileAccess.Write, FileShare.None, 4096, true))
                     {
-                        _stateTracker.UpdateState(backupName, "InProgress",
-                            currentSource: file, currentTarget: destFile);
-
-                        var startTime = DateTime.Now;
-
-                        using (var sourceStream = new FileStream(file, FileMode.Open, FileAccess.Read, FileShare.Read, 4096, useAsync: true))
-                        using (var destinationStream = new FileStream(destFile, FileMode.Create, FileAccess.Write, FileShare.None, 4096, useAsync: true))
-                        {
-                            await sourceStream.CopyToAsync(destinationStream);
-                        }
-
-                        double encryptionTimeMs = 0;
-                        var extension = Path.GetExtension(file);
-                        if (_encryptionExtensions.Contains(extension.ToLower()))
-                        {
-                            try
-                            {
-                                encryptionTimeMs = EncryptionService.Instance.EncryptFile(destFile);
-                            }
-                            catch
-                            {
-                                encryptionTimeMs = -1;
-                            }
-                        }
-
-                        var endTime = DateTime.Now;
-                        _logger.LogTransfer(backupName, file, destFile, fileInfo.Length,
-                            (endTime - startTime).TotalMilliseconds, encryptionTimeMs);
-
-                        _stateTracker.UpdateState(backupName, "InProgress", filesCopied: i + 1, sizeCopied: fileInfo.Length);
+                        await source.CopyToAsync(dest);
                     }
+
+                    double encryptionTimeMs = 0;
+                    var ext = Path.GetExtension(file).ToLower();
+                    if (_encryptionExtensions.Contains(ext))
+                    {
+                        try
+                        {
+                            encryptionTimeMs = EncryptionService.Instance.EncryptFile(destFile);
+                        }
+                        catch (Exception ex)
+                        {
+                            encryptionTimeMs = -1;
+                            System.Diagnostics.Debug.WriteLine($"Encryption failed: {ex.Message}");
+                        }
+                    }
+
+                    var end = DateTime.Now;
+
+                    _logger.LogTransfer(backupName, file, destFile, fileInfo.Length,
+                        (end - start).TotalMilliseconds, encryptionTimeMs);
+
+                    tracker.FilesCopied++;
+                    tracker.SizeCopied += fileInfo.Length;
+
+                    _stateTracker.UpdateState(backupName, "InProgress",
+                        filesCopied: tracker.FilesCopied,
+                        sizeCopied: tracker.SizeCopied,
+                        currentSource: file,
+                        currentTarget: destFile);
                 }
                 catch (Exception ex)
                 {
-                    //_logger.LogTransfer(backupName, file, destFile, fileInfo.Length, -1, -1);
-                    //_stateTracker.UpdateState(backupName, "Error", currentSource: file, currentTarget: destFile);
+                    _stateTracker.UpdateState(backupName, "Error", currentSource: file);
                 }
                 finally
                 {
@@ -818,7 +829,6 @@ namespace EasySave.Model
                         }
                     }
 
-                    // Decrement global priority file count if this was a priority file
                     if (_priorityExtensions.Contains(Path.GetExtension(file).ToLower()))
                     {
                         lock (_priorityLock)
@@ -829,6 +839,7 @@ namespace EasySave.Model
                 }
             }
         }
+
 
 
 
@@ -962,3 +973,10 @@ namespace EasySave.Model
         }
     }
 }
+
+public class ProgressTracker
+{
+    public int FilesCopied { get; set; } = 0;
+    public long SizeCopied { get; set; } = 0;
+}
+

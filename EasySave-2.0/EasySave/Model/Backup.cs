@@ -1,10 +1,12 @@
 ﻿using System;
+using System.ComponentModel;
+using System.Runtime.CompilerServices;
 using System.Text.Json.Serialization;
 
 namespace EasySave.Model
 {
     [Serializable]
-    public class Backup
+    public class Backup : INotifyPropertyChanged
     {
         [JsonPropertyName("backupName")]
         public string BackupName { get; set; }
@@ -20,6 +22,21 @@ namespace EasySave.Model
 
         [JsonIgnore]
         public string TypeDisplay { get; set; }
+
+        public event PropertyChangedEventHandler PropertyChanged;
+        protected void OnPropertyChanged([CallerMemberName] string propertyName = null) =>
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+
+        private double? _progressPercentage;
+        public double? ProgressPercentage
+        {
+            get => _progressPercentage;
+            set
+            {
+                _progressPercentage = value;
+                OnPropertyChanged();
+            }
+        }
 
         // Add a parameterless constructor for deserialization
         public Backup()
